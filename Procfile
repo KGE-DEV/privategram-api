@@ -1,1 +1,1 @@
-web: java $JAVA_OPTS -Ddw.server.applicationConnectors[0].port=$PORT -cp target/classes:target/dependency/* com.garrettestrin.sample.app.SampleApplication server target/classes/sample.yml
+web: java $JAVA_OPTS -Ddw.server.applicationConnectors[0].port=$PORT -cp target/classes:target/dependency/* com.garrettestrin.PrivateGram.app.PrivateGramApplication server target/classes/app.yml

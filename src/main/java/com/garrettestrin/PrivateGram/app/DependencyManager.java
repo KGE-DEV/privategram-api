@@ -1,8 +1,8 @@
-package com.garrettestrin.sample.app;
+package com.garrettestrin.PrivateGram.app;
 
-import com.garrettestrin.sample.api.SampleResource;
-import com.garrettestrin.sample.biz.SampleService;
-import com.garrettestrin.sample.data.SampleDao;
+import com.garrettestrin.PrivateGram.api.UserResource;
+import com.garrettestrin.PrivateGram.biz.UserService;
+import com.garrettestrin.PrivateGram.data.UserDao;
 import io.dropwizard.db.DataSourceFactory;
 import io.dropwizard.jdbi3.JdbiFactory;
 import io.dropwizard.setup.Environment;
@@ -21,19 +21,19 @@ import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 @JBossLog
 @Getter
 class DependencyManager {
-    public final SampleResource sampleResource;
+    public final UserResource userResource;
 
-    DependencyManager(SampleConfiguration config, Environment env) {
+    DependencyManager(PrivateGramConfiguration config, Environment env) {
         log.info("Initializing database pool...");
         // This creates a managed database and creates a JdbiHealthCheck
         final JdbiFactory factory = new JdbiFactory();
-        Jdbi sampleDb = newDatabase(factory, env, config.getDatabase(), "database");
+        Jdbi db = newDatabase(factory, env, config.getDatabase(), "database");
 
-        final SampleDao sampleDao = sampleDb.onDemand(SampleDao.class);
+        final UserDao userDao = db.onDemand(UserDao.class);
 
-        // SampleResource
-        val sampleService = new SampleService(sampleDao);
-        sampleResource = new SampleResource(sampleService);
+        // UserResource
+        val userService = new UserService(userDao);
+        userResource = new UserResource(userService);
     }
 
     /** Generates a new database pool. */

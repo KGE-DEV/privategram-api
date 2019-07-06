@@ -1,4 +1,4 @@
-package com.garrettestrin.sample.app;
+package com.garrettestrin.PrivateGram.app;
 
 import com.google.common.io.Resources;
 import lombok.extern.jbosslog.JBossLog;

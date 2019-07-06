@@ -19,7 +19,7 @@
                         <manifest>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib/</classpathPrefix>
-                            <mainClass>com.garrettestrin.sample.app.SampleApplication</mainClass>
+                            <mainClass>com.garrettestrin.privategram.app.PrivateGramApplication</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

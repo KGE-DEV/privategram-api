@@ -1,4 +1,4 @@
-package com.garrettestrin.sample.app;
+package com.garrettestrin.PrivateGram.app;
 
 import io.dropwizard.Application;
 import io.dropwizard.configuration.ConfigurationSourceProvider;
@@ -11,15 +11,15 @@ import lombok.extern.jbosslog.JBossLog;
 import lombok.val;
 
 @JBossLog
-public class SampleApplication extends Application<SampleConfiguration> {
+public class PrivateGramApplication extends Application<PrivateGramConfiguration> {
 
     @Override
     public String getName() {
-        return "Sample";
+        return "PrivateGram";
     }
 
     @Override
-    public void initialize(Bootstrap<SampleConfiguration> bootstrap) {
+    public void initialize(Bootstrap<PrivateGramConfiguration> bootstrap) {
 //        bootstrap.setConfigurationSourceProvider(
 //                new SubstitutingSourceProvider(bootstrap.getConfigurationSourceProvider(),
 //                        new EnvironmentVariableSubstitutor()));
@@ -29,13 +29,13 @@ public class SampleApplication extends Application<SampleConfiguration> {
     }
 
     @Override
-    public void run(SampleConfiguration configuration,
+    public void run(PrivateGramConfiguration configuration,
                     Environment environment) {
         val deps = new DependencyManager(configuration, environment);
 
         // Register resources
         log.info("Registering Resources.");
-        environment.jersey().register(deps.sampleResource);
+        environment.jersey().register(deps.userResource);
     }
 
 }

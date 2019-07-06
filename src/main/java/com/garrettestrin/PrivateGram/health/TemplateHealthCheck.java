@@ -1,4 +1,4 @@
-package com.garrettestrin.sample.health;
+package com.garrettestrin.PrivateGram.health;
 
 import com.codahale.metrics.health.HealthCheck;
 

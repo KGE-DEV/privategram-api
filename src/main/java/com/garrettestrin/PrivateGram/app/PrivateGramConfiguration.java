@@ -1,4 +1,4 @@
-package com.garrettestrin.sample.app;
+package com.garrettestrin.PrivateGram.app;
 
 import io.dropwizard.Configuration;
 import io.dropwizard.db.DataSourceFactory;
@@ -10,7 +10,7 @@ import javax.validation.constraints.NotNull;
 
 @Getter
 @Setter
-public class SampleConfiguration extends Configuration {
+public class PrivateGramConfiguration extends Configuration {
 
     @Valid
     @NotNull

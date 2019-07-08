@@ -1,13 +1,12 @@
 package com.garrettestrin.PrivateGram.api;
 
 import com.codahale.metrics.annotation.Timed;
+import com.garrettestrin.PrivateGram.api.ApiObjects.Message;
 import com.garrettestrin.PrivateGram.api.ApiObjects.User;
 import com.garrettestrin.PrivateGram.biz.UserService;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+// TODO: fix this import
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 
 @Path("/user")
@@ -17,13 +16,29 @@ public class UserResource {
     private UserService userService;
 
     public UserResource(UserService userService) {
+
         this.userService = userService;
     }
 
+    // TODO: JAVADOC
     @GET
     @Path("get/user/{id}")
     @Timed
     public User getUser(@PathParam("id") long id) {
-        return userService.getUser(id);
+
+        return userService.getUserById(id);
+    }
+
+    // TODO: JAVADOC
+    // TODO: add error handling
+    @POST
+    @Path("/register/user")
+    @Timed
+    public Message registerUser(@QueryParam("email") String email,
+                                @QueryParam("first_name") String first_name,
+                                @QueryParam("last_name") String last_name,
+                                @QueryParam("password") String password) {
+
+        return userService.registerUser(email, first_name, last_name, password);
     }
 }

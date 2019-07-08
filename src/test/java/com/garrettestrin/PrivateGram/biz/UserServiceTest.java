@@ -13,7 +13,7 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
-public class SampleServiceTest {
+public class UserServiceTest {
     private final long TEST_ID = 1L;
 
     @Mock
@@ -21,14 +21,16 @@ public class SampleServiceTest {
 
     @Before
     public void setUp() throws Exception {
-        when(userDao.getUser(TEST_ID)).thenReturn(new User(1L, "Garrett", "garrett.estrin@gmail.com"));
+        when(userDao.getUserById(TEST_ID)).thenReturn(new User(1L, "gtest@gmail.com", "garrett", "estrin", "badpassword"));
     }
 
     @Test
     public void testGetUser() throws Exception {
-        User user = userDao.getUser(TEST_ID);
+        User user = userDao.getUserById(TEST_ID);
         assertEquals(user.getId(), 1L);
-        assertEquals(user.getName(), "Garrett");
-        assertEquals(user.getEmail(), "garrett.estrin@gmail.com");
+        assertEquals(user.getFirst_name(), "garrett");
+        assertEquals(user.getLast_name(), "estrin");
+        assertEquals(user.getEmail(), "gtest@gmail.com");
+        assertEquals(user.getPassword(), "badpassword");
     }
 }

@@ -2,6 +2,7 @@ package com.garrettestrin.PrivateGram.app;
 
 import com.codahale.metrics.health.HealthCheck;
 import com.garrettestrin.PrivateGram.api.UserResource;
+import com.garrettestrin.PrivateGram.app.Auth.Auth;
 import com.garrettestrin.PrivateGram.biz.UserService;
 import com.garrettestrin.PrivateGram.data.UserDao;
 import com.garrettestrin.PrivateGram.health.DBHealthCheck;
@@ -31,10 +32,11 @@ class DependencyManager {
         final JdbiFactory factory = new JdbiFactory();
         Jdbi db = newDatabase(factory, env, config.getDatabase(), "database");
 
+        final Auth auth = new Auth();
         final UserDao userDao = db.onDemand(UserDao.class);
 
         // UserResource
-        val userService = new UserService(userDao);
+        val userService = new UserService(userDao, auth);
         userResource = new UserResource(userService);
 
         // HealthChecks

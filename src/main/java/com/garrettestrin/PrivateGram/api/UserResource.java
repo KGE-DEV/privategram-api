@@ -32,7 +32,7 @@ public class UserResource {
     // TODO: JAVADOC
     // TODO: add error handling
     @POST
-    @Path("/register/user")
+    @Path("/register")
     @Timed
     public Message registerUser(@QueryParam("email") String email,
                                 @QueryParam("first_name") String first_name,
@@ -40,5 +40,17 @@ public class UserResource {
                                 @QueryParam("password") String password) {
 
         return userService.registerUser(email, first_name, last_name, password);
+    }
+
+    // TODO: JAVADOC
+    // TODO: add error handling
+    @POST
+    @Path("/login")
+    @Timed
+    public Message registerUser(@QueryParam("email") String email,
+                                @QueryParam("password") String password) {
+
+        boolean isUserVefified = userService.verifyPassword(email, password);
+        return new Message("User Verification", isUserVefified, 200);
     }
 }

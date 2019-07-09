@@ -24,6 +24,12 @@ public interface UserDao extends SqlObject {
     Long getUserIdByEmail(@Bind("email") String email);
 
     // TODO: JAVADOC
+    @SqlQuery("SELECT password "
+            + "FROM users "
+            + "WHERE email = :email")
+    String getHashedPasswordByEmail(@Bind("email") String email);
+
+    // TODO: JAVADOC
     @SqlUpdate("INSERT INTO "
             + "users (email, first_name, last_name, password) "
             + "VALUES (:email, :first_name, :last_name, :password)")

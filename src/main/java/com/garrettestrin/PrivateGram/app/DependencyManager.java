@@ -32,7 +32,7 @@ class DependencyManager {
         final JdbiFactory factory = new JdbiFactory();
         Jdbi db = newDatabase(factory, env, config.getDatabase(), "database");
 
-        final Auth auth = new Auth();
+        final Auth auth = new Auth(config);
         final UserDao userDao = db.onDemand(UserDao.class);
 
         // UserResource

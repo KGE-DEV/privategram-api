@@ -70,7 +70,10 @@ public class UserService {
     // TODO: Add Test
     public Message verifyToken(String token) {
         Claims claims = Auth.verifyJWT(token);
-        boolean isVefified = !claims.getId().isEmpty();
-        return new Message("Token Verification", isVefified, 200, null);
+        boolean isVerified = false;
+        if(claims != null) {
+            isVerified = !claims.getId().isEmpty();
+        }
+        return new Message("Token Verification", isVerified, 200, null);
     }
 }

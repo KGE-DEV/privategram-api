@@ -17,5 +17,5 @@ database:
   # the JDBC URL;
   url: ${dw.database.url}
 
-salt: ${sw.salt}
+salt: ${dw.salt}
 secretKey: ${dw.secretKey}

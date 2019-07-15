@@ -21,15 +21,6 @@ public class UserResource {
     }
 
     // TODO: JAVADOC
-    @GET
-    @Path("get/user/{id}")
-    @Timed
-    public User getUser(@PathParam("id") long id) {
-
-        return userService.getUserById(id);
-    }
-
-    // TODO: JAVADOC
     // TODO: add error handling
     @POST
     @Path("/register")
@@ -56,7 +47,8 @@ public class UserResource {
     @POST
     @Path("/verify/token")
     @Timed
-    public Message verifyToken(@QueryParam("token") String token) {
-        return userService.verifyToken(token);
+    public Message verifyToken(@QueryParam("token") String token,
+                               @QueryParam("Auth") String auth) {
+        return userService.verifyToken(token, auth);
     }
 }

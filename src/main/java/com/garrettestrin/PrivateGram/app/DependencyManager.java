@@ -36,7 +36,7 @@ class DependencyManager {
         final UserDao userDao = db.onDemand(UserDao.class);
 
         // UserResource
-        val userService = new UserService(userDao, auth);
+        val userService = new UserService(userDao, auth, config);
         userResource = new UserResource(userService);
 
         // HealthChecks

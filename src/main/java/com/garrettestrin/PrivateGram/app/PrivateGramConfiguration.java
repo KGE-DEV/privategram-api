@@ -18,6 +18,8 @@ public class PrivateGramConfiguration extends Configuration {
     private String salt;
     @NotEmpty
     private String secretKey;
+    @NotEmpty
+    private String authToken;
 
     @Valid
     @NotNull

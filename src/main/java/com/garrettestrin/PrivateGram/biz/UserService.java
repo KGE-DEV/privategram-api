@@ -3,6 +3,7 @@ package com.garrettestrin.PrivateGram.biz;
 import com.garrettestrin.PrivateGram.api.ApiObjects.Message;
 import com.garrettestrin.PrivateGram.api.ApiObjects.User;
 import com.garrettestrin.PrivateGram.app.Auth.Auth;
+import com.garrettestrin.PrivateGram.app.PrivateGramConfiguration;
 import com.garrettestrin.PrivateGram.data.UserDao;
 import io.jsonwebtoken.Claims;
 
@@ -10,11 +11,15 @@ public class UserService {
 
     private final UserDao userDao;
     private final Auth auth;
+    private final PrivateGramConfiguration config;
+    private final String AUTH_TOKEN;
 
-    public UserService(UserDao userDao, Auth auth) {
+    public UserService(UserDao userDao, Auth auth, PrivateGramConfiguration config) {
 
         this.userDao = userDao;
         this.auth = auth;
+        this.config = config;
+        this.AUTH_TOKEN = config.getAuthToken();
     }
 
     // TODO: JAVADOC
@@ -68,12 +73,19 @@ public class UserService {
 
     // TODO: JAVADOC
     // TODO: Add Test
-    public Message verifyToken(String token) {
+    public Message verifyToken(String token, String auth) {
+        if(!auth.equals(AUTH_TOKEN)) {
+            return unauthorized();
+        }
         Claims claims = Auth.verifyJWT(token);
         boolean isVerified = false;
         if(claims != null) {
             isVerified = !claims.getId().isEmpty();
         }
         return new Message("Token Verification", isVerified, 200, null);
+    }
+
+    public Message unauthorized() {
+        return new Message("Unauthorized", false, 401, null);
     }
 }

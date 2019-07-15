@@ -19,3 +19,4 @@ database:
 
 salt: ${dw.salt}
 secretKey: ${dw.secretKey}
+authToken: ${dw.authToken}

@@ -34,7 +34,7 @@ public class ApplicationPropertyLoader {
             throw new IOException("Cannot load the configuration, PROPERTIES_FILENAME must be provided");
         }
         properties.stringPropertyNames()
-                .forEach((name) -> System.setProperty("DW_" + name, properties.getProperty(name)));
+                .forEach((name) -> System.setProperty("dw." + name, properties.getProperty(name)));
     }
 
     /**

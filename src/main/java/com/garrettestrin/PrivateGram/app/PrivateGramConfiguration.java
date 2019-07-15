@@ -19,28 +19,7 @@ public class PrivateGramConfiguration extends Configuration {
     @NotEmpty
     private String secretKey;
 
-
     @Valid
     @NotNull
     private DataSourceFactory database;
-
-    @JsonProperty
-    public String getSalt() {
-        return salt;
-    }
-
-    @JsonProperty
-    public void setSalt(String salt) {
-        this.salt = salt;
-    }
-
-    @JsonProperty
-    public String getSecretKey() {
-        return secretKey;
-    }
-
-    @JsonProperty
-    public void setSecretKey(String secretKey) {
-        this.secretKey = secretKey;
-    }
 }

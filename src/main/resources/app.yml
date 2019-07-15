@@ -1,0 +1,21 @@
+server:
+  applicationConnectors:
+    - type: http
+      port: 5000
+  adminConnectors:
+    - type: http
+      port: 5001
+
+# Database settings.
+database:
+  # the name of the JDBC driver, mysql in our case
+  driverClass: com.mysql.jdbc.Driver
+  # the username
+  user: ${dw.database.user}
+  # the password
+  password: ${dw.database.password}
+  # the JDBC URL;
+  url: ${dw.database.url}
+
+salt: ${sw.salt}
+secretKey: ${dw.secretKey}

@@ -50,7 +50,13 @@ public class UserResource {
     public Message registerUser(@QueryParam("email") String email,
                                 @QueryParam("password") String password) {
 
-        boolean isUserVefified = userService.verifyPassword(email, password);
-        return new Message("User Verification", isUserVefified, 200);
+        return userService.loginUser(email, password);
+    }
+
+    @POST
+    @Path("/verify/token")
+    @Timed
+    public Message verifyToken(@QueryParam("token") String token) {
+        return userService.verifyToken(token);
     }
 }

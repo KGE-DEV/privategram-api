@@ -13,5 +13,5 @@ public class Message {
     public String message;
     public boolean success;
     public int code;
-    public String jwt;
+    public String data;
 }

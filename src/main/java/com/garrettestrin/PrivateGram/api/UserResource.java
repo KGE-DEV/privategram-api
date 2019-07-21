@@ -44,6 +44,16 @@ public class UserResource {
         return userService.loginUser(email, password);
     }
 
+    // TODO: JAVADOC
+    // TODO: add error handling
+    @POST
+    @Path("/reset/password")
+    @Timed
+    public Message resetPassword(@QueryParam("email") String email) {
+
+        return userService.resetPassword(email);
+    }
+
     @POST
     @Path("/verify/token")
     @Timed

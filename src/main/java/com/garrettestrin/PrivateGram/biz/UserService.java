@@ -4,10 +4,16 @@ import com.garrettestrin.PrivateGram.api.ApiObjects.Message;
 import com.garrettestrin.PrivateGram.api.ApiObjects.User;
 import com.garrettestrin.PrivateGram.app.Auth.Auth;
 import com.garrettestrin.PrivateGram.app.PrivateGramConfiguration;
+import com.garrettestrin.PrivateGram.data.DataObjects.ResetPasswordToken;
 import com.garrettestrin.PrivateGram.data.UserDao;
 import com.garrettestrin.PrivateGram.biz.BizObjects.ValidatedUserInformation;
 
 import io.jsonwebtoken.Claims;
+
+import java.nio.charset.Charset;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Random;
 
 public class UserService {
 
@@ -94,6 +100,28 @@ public class UserService {
         return new Message("Token Verification", isVerified, 200, null);
     }
 
+    // TODO: JAVADOC
+    // TODO: Add Test
+    public Message resetPassword(String email) {
+        ResetPasswordToken tokenObject = userDao.checkForExistingResetToken(email);
+        if(tokenObject == null) {
+            String token = generateResetToken();
+            userDao.resetPassword(email, token, getTimeInXHours(48));
+            return new Message("Password reset email sent to " + email, true, 200, token);
+        }
+        if(tokenObject.getExpiration().compareTo(getTimeInXHours(48)) > 0) {
+            return new Message("Password reset email sent to " + email, true, 200, tokenObject.getToken());
+        } else if(tokenObject.getToken() != null || tokenObject.getExpiration().compareTo(getTimeInXHours(48)) < 0) {
+            userDao.deleteExistingResetPasswordToken(email);
+            String token = generateResetToken();
+            userDao.resetPassword(email, token, getTimeInXHours(48));
+            return new Message("Password reset email sent to " + email, true, 200, token);
+        }
+        String token = generateResetToken();
+        userDao.resetPassword(email, token, getTimeInXHours(48));
+        return new Message("Password reset email sent to " + email, true, 200, token);
+    }
+
     public ValidatedUserInformation validateUserInformation(String email, String first_name, String last_name, String password) {
         return new ValidatedUserInformation(validateEmail(email), validateName(first_name), validateName(last_name), validatePassword(password));
     }
@@ -108,6 +136,27 @@ public class UserService {
 
     public boolean validatePassword(String password) {
         return password.matches("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=\\S+$).{8,16}$");
+    }
+
+    private Date getTimeInXHours(int hours) {
+        Calendar cal = Calendar.getInstance(); // creates calendar
+        cal.setTime(new Date()); // sets calendar time/date
+        cal.add(Calendar.HOUR_OF_DAY, hours); // adds one hour
+        return cal.getTime();
+    }
+
+    private String generateResetToken() {
+        int leftLimit = 97; // letter 'a'
+        int rightLimit = 122; // letter 'z'
+        int targetStringLength = 60;
+        Random random = new Random();
+        StringBuilder buffer = new StringBuilder(targetStringLength);
+        for (int i = 0; i < targetStringLength; i++) {
+            int randomLimitedInt = leftLimit + (int)
+                    (random.nextFloat() * (rightLimit - leftLimit + 1));
+            buffer.append((char) randomLimitedInt);
+        }
+        return buffer.toString();
     }
 
     public Message unauthorized() {

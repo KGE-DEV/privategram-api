@@ -106,20 +106,16 @@ public class UserService {
         ResetPasswordToken tokenObject = userDao.checkForExistingResetToken(email);
         if(tokenObject == null) {
             String token = generateResetToken();
-            userDao.resetPassword(email, token, getTimeInXHours(48));
+            userDao.resetPassword(email, token, getTimeInXHours(0));
             return new Message("Password reset email sent to " + email, true, 200, token);
-        }
-        if(tokenObject.getExpiration().compareTo(getTimeInXHours(48)) > 0) {
+        } else if(Calendar.getInstance().getTime().before(tokenObject.expiration)) {
             return new Message("Password reset email sent to " + email, true, 200, tokenObject.getToken());
-        } else if(tokenObject.getToken() != null || tokenObject.getExpiration().compareTo(getTimeInXHours(48)) < 0) {
+        } else {
             userDao.deleteExistingResetPasswordToken(email);
             String token = generateResetToken();
             userDao.resetPassword(email, token, getTimeInXHours(48));
             return new Message("Password reset email sent to " + email, true, 200, token);
         }
-        String token = generateResetToken();
-        userDao.resetPassword(email, token, getTimeInXHours(48));
-        return new Message("Password reset email sent to " + email, true, 200, token);
     }
 
     public ValidatedUserInformation validateUserInformation(String email, String first_name, String last_name, String password) {

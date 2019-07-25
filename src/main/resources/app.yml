@@ -20,3 +20,8 @@ database:
 salt: ${dw.salt}
 secretKey: ${dw.secretKey}
 authToken: ${dw.authToken}
+
+#email
+emailUser: ${dw.emailUser}
+emailHost: ${dw.emailHost}
+emailPassword: ${dw.emailPassword}

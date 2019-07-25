@@ -21,6 +21,13 @@ public class PrivateGramConfiguration extends Configuration {
     @NotEmpty
     private String authToken;
 
+    @NotEmpty
+    private String emailUser;
+    @NotEmpty
+    private String emailHost;
+    @NotEmpty
+    private String emailPassword;
+
     @Valid
     @NotNull
     private DataSourceFactory database;

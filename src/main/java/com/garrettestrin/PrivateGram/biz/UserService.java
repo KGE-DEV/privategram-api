@@ -10,7 +10,6 @@ import com.garrettestrin.PrivateGram.biz.BizObjects.ValidatedUserInformation;
 
 import io.jsonwebtoken.Claims;
 
-import java.nio.charset.Charset;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Random;
@@ -21,6 +20,7 @@ public class UserService {
     private final Auth auth;
     private final PrivateGramConfiguration config;
     private final String AUTH_TOKEN;
+    private final BizUtilities bizUtilities;
 
     public UserService(UserDao userDao, Auth auth, PrivateGramConfiguration config) {
 
@@ -28,6 +28,7 @@ public class UserService {
         this.auth = auth;
         this.config = config;
         this.AUTH_TOKEN = config.getAuthToken();
+        this.bizUtilities = new BizUtilities(config.getEmailUser(), config.getEmailHost(), config.getEmailPassword());
     }
 
     // TODO: JAVADOC
@@ -103,19 +104,23 @@ public class UserService {
     // TODO: JAVADOC
     // TODO: Add Test
     public Message resetPassword(String email) {
+        Message message = new Message("Password reset email sent to " + email, true, 200, null);
+        String token = generateResetToken();
         ResetPasswordToken tokenObject = userDao.checkForExistingResetToken(email);
+
         if(tokenObject == null) {
-            String token = generateResetToken();
             userDao.resetPassword(email, token, getTimeInXHours(0));
-            return new Message("Password reset email sent to " + email, true, 200, token);
         } else if(Calendar.getInstance().getTime().before(tokenObject.expiration)) {
-            return new Message("Password reset email sent to " + email, true, 200, tokenObject.getToken());
+            token = tokenObject.token;
         } else {
             userDao.deleteExistingResetPasswordToken(email);
-            String token = generateResetToken();
             userDao.resetPassword(email, token, getTimeInXHours(48));
-            return new Message("Password reset email sent to " + email, true, 200, token);
         }
+
+        boolean emailSent = bizUtilities.sendEmail(email, "Password Reset Link", "Here is your password reset token: " + token);
+        if(!emailSent)
+            message.setMessage("Password Email was not sent");
+        return message;
     }
 
     public ValidatedUserInformation validateUserInformation(String email, String first_name, String last_name, String password) {

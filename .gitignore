@@ -14,3 +14,11 @@ buildNumber.properties
 \.idea/
 
 *.properties
+
+\.metadata/
+
+\.settings/
+
+\.project
+
+\.classpath

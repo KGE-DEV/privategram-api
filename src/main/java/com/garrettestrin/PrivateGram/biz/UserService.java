@@ -4,10 +4,11 @@ import com.garrettestrin.PrivateGram.api.ApiObjects.Message;
 import com.garrettestrin.PrivateGram.api.ApiObjects.User;
 import com.garrettestrin.PrivateGram.app.Auth.Auth;
 import com.garrettestrin.PrivateGram.app.PrivateGramConfiguration;
-import com.garrettestrin.PrivateGram.data.UserDao;
 import com.garrettestrin.PrivateGram.biz.BizObjects.ValidatedUserInformation;
-
+import com.garrettestrin.PrivateGram.data.UserDao;
 import io.jsonwebtoken.Claims;
+
+import java.util.Date;
 
 public class UserService {
 

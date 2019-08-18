@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.garrettestrin</groupId>
-    <artifactId>sample</artifactId>
+    <artifactId>PrivateGram</artifactId>
     <version>0.1-SNAPSHOT</version>
     <build>
         <plugins>

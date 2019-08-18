@@ -4,11 +4,13 @@ import com.garrettestrin.PrivateGram.api.ApiObjects.Message;
 import com.garrettestrin.PrivateGram.api.ApiObjects.User;
 import com.garrettestrin.PrivateGram.app.Auth.Auth;
 import com.garrettestrin.PrivateGram.app.PrivateGramConfiguration;
-import com.garrettestrin.PrivateGram.biz.BizObjects.ValidatedUserInformation;
+import com.garrettestrin.PrivateGram.data.DataObjects.ResetPasswordToken;
 import com.garrettestrin.PrivateGram.data.UserDao;
 import io.jsonwebtoken.Claims;
 
+import java.util.Calendar;
 import java.util.Date;
+import java.util.Random;
 
 public class UserService {
 
@@ -16,6 +18,7 @@ public class UserService {
     private final Auth auth;
     private final PrivateGramConfiguration config;
     private final String AUTH_TOKEN;
+    private final BizUtilities bizUtilities;
 
     public UserService(UserDao userDao, Auth auth, PrivateGramConfiguration config) {
 
@@ -23,6 +26,7 @@ public class UserService {
         this.auth = auth;
         this.config = config;
         this.AUTH_TOKEN = config.getAuthToken();
+        this.bizUtilities = new BizUtilities(config.getEmailUser(), config.getEmailHost(), config.getEmailPassword());
     }
 
     // TODO: JAVADOC
@@ -95,6 +99,28 @@ public class UserService {
         return new Message("Token Verification", isVerified, 200, null);
     }
 
+    // TODO: JAVADOC
+    // TODO: Add Test
+    public Message resetPassword(String email) {
+        Message message = new Message("Password reset email sent to " + email, true, 200, null);
+        String token = generateResetToken();
+        ResetPasswordToken tokenObject = userDao.checkForExistingResetToken(email);
+
+        if(tokenObject == null) {
+            userDao.resetPassword(email, token, getTimeInXHours(0));
+        } else if(Calendar.getInstance().getTime().before(tokenObject.expiration)) {
+            token = tokenObject.token;
+        } else {
+            userDao.deleteExistingResetPasswordToken(email);
+            userDao.resetPassword(email, token, getTimeInXHours(48));
+        }
+
+        boolean emailSent = bizUtilities.sendEmail(email, "Password Reset Link", "Here is your password reset token: " + token);
+        if(!emailSent)
+            message.setMessage("Password Email was not sent");
+        return message;
+    }
+
     public ValidatedUserInformation validateUserInformation(String email, String first_name, String last_name, String password) {
         return new ValidatedUserInformation(validateEmail(email), validateName(first_name), validateName(last_name), validatePassword(password));
     }
@@ -109,6 +135,27 @@ public class UserService {
 
     public boolean validatePassword(String password) {
         return password.matches("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=\\S+$).{8,16}$");
+    }
+
+    private Date getTimeInXHours(int hours) {
+        Calendar cal = Calendar.getInstance(); // creates calendar
+        cal.setTime(new Date()); // sets calendar time/date
+        cal.add(Calendar.HOUR_OF_DAY, hours); // adds one hour
+        return cal.getTime();
+    }
+
+    private String generateResetToken() {
+        int leftLimit = 97; // letter 'a'
+        int rightLimit = 122; // letter 'z'
+        int targetStringLength = 60;
+        Random random = new Random();
+        StringBuilder buffer = new StringBuilder(targetStringLength);
+        for (int i = 0; i < targetStringLength; i++) {
+            int randomLimitedInt = leftLimit + (int)
+                    (random.nextFloat() * (rightLimit - leftLimit + 1));
+            buffer.append((char) randomLimitedInt);
+        }
+        return buffer.toString();
     }
 
     public Message unauthorized() {

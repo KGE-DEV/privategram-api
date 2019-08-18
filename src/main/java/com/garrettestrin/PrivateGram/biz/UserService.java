@@ -6,8 +6,6 @@ import com.garrettestrin.PrivateGram.app.Auth.Auth;
 import com.garrettestrin.PrivateGram.app.PrivateGramConfiguration;
 import com.garrettestrin.PrivateGram.data.DataObjects.ResetPasswordToken;
 import com.garrettestrin.PrivateGram.data.UserDao;
-import com.garrettestrin.PrivateGram.biz.BizObjects.ValidatedUserInformation;
-
 import io.jsonwebtoken.Claims;
 
 import java.util.Calendar;

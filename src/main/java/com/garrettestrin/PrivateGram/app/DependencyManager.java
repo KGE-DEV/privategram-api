@@ -1,6 +1,7 @@
 package com.garrettestrin.PrivateGram.app;
 
 import com.codahale.metrics.health.HealthCheck;
+import com.garrettestrin.PrivateGram.api.CommentResource;
 import com.garrettestrin.PrivateGram.api.UserResource;
 import com.garrettestrin.PrivateGram.app.Auth.Auth;
 import com.garrettestrin.PrivateGram.biz.UserService;
@@ -25,6 +26,7 @@ import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 @Getter
 class DependencyManager {
     public final UserResource userResource;
+    public final CommentResource commentResource;
 
     DependencyManager(PrivateGramConfiguration config, Environment env) {
         log.info("Initializing database pool...");
@@ -38,6 +40,8 @@ class DependencyManager {
         // UserResource
         val userService = new UserService(userDao, auth, config);
         userResource = new UserResource(userService);
+
+        commentResource = new CommentResource();
 
         // HealthChecks
         HealthCheck dbHealthCheck = new DBHealthCheck("users");

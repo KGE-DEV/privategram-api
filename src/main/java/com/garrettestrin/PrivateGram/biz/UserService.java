@@ -12,6 +12,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Random;
 
+import static org.apache.commons.lang3.StringUtils.isEmpty;
+
 public class UserService {
 
     private final UserDao userDao;
@@ -76,7 +78,7 @@ public class UserService {
     public boolean verifyPassword(String email, String password) {
         String hashedPassword = userDao.getHashedPasswordByEmail(email);
         String newHashedPassword = auth.hashPassword(password);
-        if(hashedPassword.equals(newHashedPassword))
+        if(!isEmpty(hashedPassword) && hashedPassword.equals(newHashedPassword))
             return true;
         return false;
     }

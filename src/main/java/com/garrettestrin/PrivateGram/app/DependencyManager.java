@@ -2,6 +2,7 @@ package com.garrettestrin.PrivateGram.app;
 
 import com.codahale.metrics.health.HealthCheck;
 import com.garrettestrin.PrivateGram.api.CommentResource;
+import com.garrettestrin.PrivateGram.api.UserResource;
 import com.garrettestrin.PrivateGram.app.Auth.Auth;
 import com.garrettestrin.PrivateGram.app.Auth.AuthenticatedUserConverterProvider;
 import com.garrettestrin.PrivateGram.biz.CommentService;
@@ -25,7 +26,7 @@ import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 @JBossLog
 @Getter
 class DependencyManager {
-//    public final UserResource userResource;
+    public final UserResource userResource;
     public final CommentResource commentResource;
     public final AuthenticatedUserConverterProvider authenticatedUserConverterProvider;
 
@@ -41,7 +42,7 @@ class DependencyManager {
         // UserResource
 //        final UserDao userDao = db.onDemand(UserDao.class);
 //        val userService = new UserService(userDao, auth, config);
-//        userResource = new UserResource(userService);
+        userResource = new UserResource(auth);
 //        CommentResource
         final CommentDao commentDao = db.onDemand(CommentDao.class);
         val commentService = new CommentService(commentDao);

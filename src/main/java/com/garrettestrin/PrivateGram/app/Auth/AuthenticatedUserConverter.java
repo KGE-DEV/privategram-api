@@ -18,16 +18,7 @@ public class AuthenticatedUserConverter implements ParamConverter<AuthenticatedU
       return null;
     }
         Claims claims = auth.verifyJWT(token);
-//        boolean isVerified = false;
-//        if(claims != null) {
-//            isVerified = !claims.getId().isEmpty();
-//        }
-//    String genToken = auth.createJWT("1", "garrett.estrin@gmail.com", "elsie_gram_auth", -1);
-
         return new AuthenticatedUser(claims.getId(), token);
-//    return new AuthenticatedUser("1", genToken);
-
-//    return new AuthenticatedUser(auth.createJWT("garrett.estrin@gmail.com", "Garrett", "elsie_gram_auth", -1));
   }
 
   @Override

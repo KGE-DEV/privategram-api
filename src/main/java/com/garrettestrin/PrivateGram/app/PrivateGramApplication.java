@@ -35,8 +35,10 @@ public class PrivateGramApplication extends Application<PrivateGramConfiguration
 
         // Register resources
         log.info("Registering Resources.");
-        environment.jersey().register(deps.userResource);
+//        environment.jersey().register(deps.userResource);
         environment.jersey().register(deps.commentResource);
+
+        environment.jersey().register(deps.authenticatedUserConverterProvider);
     }
 
 }

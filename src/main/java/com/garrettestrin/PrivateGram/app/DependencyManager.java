@@ -2,9 +2,8 @@ package com.garrettestrin.PrivateGram.app;
 
 import com.codahale.metrics.health.HealthCheck;
 import com.garrettestrin.PrivateGram.api.CommentResource;
-import com.garrettestrin.PrivateGram.api.UserResource;
 import com.garrettestrin.PrivateGram.app.Auth.Auth;
-import com.garrettestrin.PrivateGram.biz.UserService;
+import com.garrettestrin.PrivateGram.app.Auth.AuthenticatedUserConverterProvider;
 import com.garrettestrin.PrivateGram.data.UserDao;
 import com.garrettestrin.PrivateGram.health.DBHealthCheck;
 import io.dropwizard.db.DataSourceFactory;
@@ -25,8 +24,9 @@ import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 @JBossLog
 @Getter
 class DependencyManager {
-    public final UserResource userResource;
+//    public final UserResource userResource;
     public final CommentResource commentResource;
+    public final AuthenticatedUserConverterProvider authenticatedUserConverterProvider;
 
     DependencyManager(PrivateGramConfiguration config, Environment env) {
         log.info("Initializing database pool...");
@@ -38,10 +38,12 @@ class DependencyManager {
         final UserDao userDao = db.onDemand(UserDao.class);
 
         // UserResource
-        val userService = new UserService(userDao, auth, config);
-        userResource = new UserResource(userService);
+//        val userService = new UserService(userDao, auth, config);
+//        userResource = new UserResource(userService);
 
         commentResource = new CommentResource();
+
+        authenticatedUserConverterProvider = new AuthenticatedUserConverterProvider(config);
 
         // HealthChecks
         HealthCheck dbHealthCheck = new DBHealthCheck("users");

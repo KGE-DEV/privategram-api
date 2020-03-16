@@ -22,7 +22,7 @@ public class Auth {
     private static final int KEY_LENGTH = 512;
     private static final String ALGORITHM = "PBKDF2WithHmacSHA512";
     private static PrivateGramConfiguration config;
-    private static String SECRET_KEY;
+    public static String SECRET_KEY;
 
     public Auth(PrivateGramConfiguration config) {
 

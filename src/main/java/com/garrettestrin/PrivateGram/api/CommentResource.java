@@ -28,12 +28,6 @@ public class CommentResource {
   public CommentResponse addComment(Comment c, @CookieParam("elsie_gram_auth") AuthenticatedUser authenticatedUser) {
       return commentService.postComment(c.comment, c.postId, authenticatedUser.getUserId());
   }
-
-  @POST
-  @Path("/createToken")
-  public CommentResponse getToken(@CookieParam("elsie_gram_auth") AuthenticatedUser authenticatedUser) {
-    return new CommentResponse(true, authenticatedUser.getToken());
-  }
 }
 
 

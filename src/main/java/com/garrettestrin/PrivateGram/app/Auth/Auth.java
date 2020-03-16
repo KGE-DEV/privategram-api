@@ -2,28 +2,19 @@ package com.garrettestrin.PrivateGram.app.Auth;
 
 
 import com.garrettestrin.PrivateGram.app.PrivateGramConfiguration;
-import java.security.Key;
-import java.security.SecureRandom;
-import java.util.Base64;
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
-import java.util.Arrays;
-import java.util.Date;
+import io.jsonwebtoken.*;
+
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 import javax.xml.bind.DatatypeConverter;
-import io.jsonwebtoken.SignatureAlgorithm;
-import javax.crypto.spec.SecretKeySpec;
-import javax.xml.bind.DatatypeConverter;
 import java.security.Key;
-
-import io.jsonwebtoken.*;
-
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.security.spec.InvalidKeySpecException;
+import java.util.Arrays;
+import java.util.Base64;
 import java.util.Date;
-
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.Claims;
 
 public class Auth {
     private static final SecureRandom RAND = new SecureRandom();
@@ -72,7 +63,7 @@ public class Auth {
         }
     }
 
-    public static String createJWT(String email, String issuer, String subject, long ttlMillis) {
+    public static String createJWT(String userId, String issuer, String subject, long ttlMillis) {
 
         //The JWT signature algorithm we will be using to sign the token
         SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
@@ -85,7 +76,7 @@ public class Auth {
         Key signingKey = new SecretKeySpec(apiKeySecretBytes, signatureAlgorithm.getJcaName());
 
         //Let's set the JWT Claims
-        JwtBuilder builder = Jwts.builder().setId(email)
+        JwtBuilder builder = Jwts.builder().setId(userId)
                 .setIssuedAt(now)
                 .setSubject(subject)
                 .setIssuer(issuer)

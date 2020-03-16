@@ -1,12 +1,10 @@
 package com.garrettestrin.PrivateGram.api.ApiObjects;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
 public class Comment {
-  String content;
+    @JsonProperty("comment")
+    public String comment;
+    @JsonProperty("postId")
+    public int postId;
 }

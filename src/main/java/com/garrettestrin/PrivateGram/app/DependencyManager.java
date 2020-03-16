@@ -4,7 +4,8 @@ import com.codahale.metrics.health.HealthCheck;
 import com.garrettestrin.PrivateGram.api.CommentResource;
 import com.garrettestrin.PrivateGram.app.Auth.Auth;
 import com.garrettestrin.PrivateGram.app.Auth.AuthenticatedUserConverterProvider;
-import com.garrettestrin.PrivateGram.data.UserDao;
+import com.garrettestrin.PrivateGram.biz.CommentService;
+import com.garrettestrin.PrivateGram.data.CommentDao;
 import com.garrettestrin.PrivateGram.health.DBHealthCheck;
 import io.dropwizard.db.DataSourceFactory;
 import io.dropwizard.jdbi3.JdbiFactory;
@@ -35,13 +36,16 @@ class DependencyManager {
         Jdbi db = newDatabase(factory, env, config.getDatabase(), "database");
 
         final Auth auth = new Auth(config);
-        final UserDao userDao = db.onDemand(UserDao.class);
+
 
         // UserResource
+//        final UserDao userDao = db.onDemand(UserDao.class);
 //        val userService = new UserService(userDao, auth, config);
 //        userResource = new UserResource(userService);
-
-        commentResource = new CommentResource();
+//        CommentResource
+        final CommentDao commentDao = db.onDemand(CommentDao.class);
+        val commentService = new CommentService(commentDao);
+        commentResource = new CommentResource(commentService);
 
         authenticatedUserConverterProvider = new AuthenticatedUserConverterProvider(config);
 

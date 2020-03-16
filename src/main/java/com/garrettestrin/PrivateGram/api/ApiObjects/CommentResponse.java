@@ -1,4 +1,4 @@
-package com.garrettestrin.PrivateGram.app.Auth;
+package com.garrettestrin.PrivateGram.api.ApiObjects;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class AuthenticatedUser {
-  public String userId;
-  public String token;
+public class CommentResponse {
+  boolean success;
+  String message;
 }

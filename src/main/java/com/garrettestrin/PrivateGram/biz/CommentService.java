@@ -10,11 +10,17 @@ public class CommentService {
   public CommentService(CommentDao commentDao) {
     this.commentDao = commentDao;
   }
+
+
   public CommentResponse postComment(String comment, int postId, String userId) {
     boolean wasCommentPosted = commentDao.postComment(postId, comment, userId);
     if(wasCommentPosted) {
       return new CommentResponse(true, null);
     }
     return new CommentResponse(false, null);
+  }
+
+  public CommentResponse getAllComments(int post_id) {
+    return new CommentResponse(true, null);
   }
 }

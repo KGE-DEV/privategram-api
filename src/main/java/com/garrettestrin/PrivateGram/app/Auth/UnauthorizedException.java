@@ -6,7 +6,7 @@ import javax.ws.rs.ext.Provider;
 @Provider
 public class UnauthorizedException extends WebApplicationException {
 
-  static final String UNAUTHORIZED_USER_MESSAGE = "{\"message\":\"User is unauthorized\"}";
+  static final String UNAUTHORIZED_USER_MESSAGE = "{\"message\":\"User is unauthorized\", \"success\":false}";
   private int code;
   public UnauthorizedException() {
     this(401);

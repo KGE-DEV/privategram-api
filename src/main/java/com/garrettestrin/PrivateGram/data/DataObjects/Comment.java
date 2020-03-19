@@ -12,4 +12,5 @@ public class Comment {
   public String comment;
   public int post_id;
   public String user_id;
+  public boolean active;
 }

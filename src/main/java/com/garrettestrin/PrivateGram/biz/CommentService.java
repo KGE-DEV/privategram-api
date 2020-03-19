@@ -10,6 +10,9 @@ public class CommentService {
 
   private final CommentDao commentDao;
 
+  private final String DELETED_MESSAGE_SUCCESS = "comment was deleted";
+  private final String DELETED_MESSASGE_FALSE = "comment was not deleted";
+
   public CommentService(CommentDao commentDao) {
     this.commentDao = commentDao;
   }
@@ -17,14 +20,22 @@ public class CommentService {
 
   public CommentResponse postComment(String comment, int postId, String userId) {
     boolean wasCommentPosted = commentDao.postComment(postId, comment, userId);
-    if(wasCommentPosted) {
-      return new CommentResponse(true, null, null);
-    }
-    return new CommentResponse(false, null, null);
+    return new CommentResponse(wasCommentPosted, null, null);
   }
 
   public CommentResponse getAllComments(int post_id) {
     List<Comment> comments = commentDao.getAllComments(post_id);
     return new CommentResponse(true, null, comments);
+  }
+
+  public CommentResponse getCommentsPreview(int post_id) {
+    List<Comment> comments = commentDao.getCommentsPreview(post_id);
+    return new CommentResponse(true, null, comments);
+  }
+
+  public CommentResponse deleteComment(int comment_id) {
+      boolean wasCommentDeleted = commentDao.deleteComment(comment_id);
+      String message = wasCommentDeleted ? DELETED_MESSAGE_SUCCESS : DELETED_MESSASGE_FALSE;
+      return new CommentResponse(wasCommentDeleted, message, null);
   }
 }

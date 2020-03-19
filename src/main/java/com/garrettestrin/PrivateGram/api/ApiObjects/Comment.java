@@ -7,4 +7,6 @@ public class Comment {
     public String comment;
     @JsonProperty("postId")
     public int postId;
+    @JsonProperty("commentId")
+    public int commentId;
 }

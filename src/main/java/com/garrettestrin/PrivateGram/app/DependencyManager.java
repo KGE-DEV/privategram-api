@@ -5,6 +5,8 @@ import com.garrettestrin.PrivateGram.api.CommentResource;
 import com.garrettestrin.PrivateGram.api.UserResource;
 import com.garrettestrin.PrivateGram.app.Auth.Auth;
 import com.garrettestrin.PrivateGram.app.Auth.AuthenticatedUserConverterProvider;
+import com.garrettestrin.PrivateGram.app.Auth.UnauthorizedException;
+import com.garrettestrin.PrivateGram.app.Auth.UnauthorizedExceptionMapper;
 import com.garrettestrin.PrivateGram.biz.CommentService;
 import com.garrettestrin.PrivateGram.data.CommentDao;
 import com.garrettestrin.PrivateGram.health.DBHealthCheck;
@@ -29,6 +31,7 @@ class DependencyManager {
     public final UserResource userResource;
     public final CommentResource commentResource;
     public final AuthenticatedUserConverterProvider authenticatedUserConverterProvider;
+    public final UnauthorizedExceptionMapper unauthorizedExceptionMapper;
 
     DependencyManager(PrivateGramConfiguration config, Environment env) {
         log.info("Initializing database pool...");
@@ -49,6 +52,7 @@ class DependencyManager {
         commentResource = new CommentResource(commentService);
 
         authenticatedUserConverterProvider = new AuthenticatedUserConverterProvider(config);
+        unauthorizedExceptionMapper = new UnauthorizedExceptionMapper();
 
         // HealthChecks
         HealthCheck dbHealthCheck = new DBHealthCheck("users");

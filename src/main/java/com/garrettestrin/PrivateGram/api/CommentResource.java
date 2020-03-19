@@ -6,6 +6,7 @@ import com.garrettestrin.PrivateGram.api.ApiObjects.CommentResponse;
 import com.garrettestrin.PrivateGram.app.Auth.AuthenticatedUser;
 import com.garrettestrin.PrivateGram.app.Auth.UnauthorizedException;
 import com.garrettestrin.PrivateGram.biz.CommentService;
+import io.dropwizard.jersey.PATCH;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -40,6 +41,13 @@ public class CommentResource {
   @Timed
   public CommentResponse getCommentsPreview(@QueryParam("post_id") int post_id, @CookieParam(AUTH_COOKIE) AuthenticatedUser authenticatedUser) {
     return commentService.getCommentsPreview(post_id);
+  }
+
+  @PATCH
+  @Path("edit")
+  @Timed
+  public CommentResponse editComment(Comment c, @CookieParam(AUTH_COOKIE) AuthenticatedUser authenticatedUser) {
+    return commentService.editComment(c.commentId, c.comment);
   }
 
   @DELETE

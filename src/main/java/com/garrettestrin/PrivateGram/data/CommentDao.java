@@ -14,8 +14,15 @@ public interface CommentDao extends SqlObject {
   // TODO: JAVADOC
   @SqlUpdate("INSERT INTO "
           + "`comments` (`post_id`, `comment`, `user_id`) "
-          +   "VALUES (:post_id, :comment, :user_id) ")
+          +   "VALUES (:post_id, :comment, :user_id);")
   boolean postComment(@Bind("post_id") int post_id, @Bind("comment") String comment, @Bind("user_id") String user_id);
+
+  // TODO: JAVADOC
+  @SqlQuery("SELECT * "
+            + "FROM `comments` "
+            + "WHERE id = :comment_id LIMIT 1")
+  @RegisterBeanMapper(Comment.class)
+  List<Comment> getComment(@Bind("comment_id") int comment_id);
 
 //  TODO: JAVADOC
   @SqlQuery("SELECT * "
@@ -31,6 +38,12 @@ public interface CommentDao extends SqlObject {
           + "LIMIT 3")
   @RegisterBeanMapper(Comment.class)
   List<Comment> getCommentsPreview(@Bind("post_id") int post_id);
+
+  // TODO: JAVADOC
+  @SqlUpdate("UPDATE `comments` "
+            + "SET comment = :comment "
+            + "WHERE id = :comment_id")
+  boolean editComment(@Bind("comment_id") int comment_id, @Bind("comment") String comment);
 
   //  TODO: JAVADOC
   @SqlUpdate("UPDATE `comments` "

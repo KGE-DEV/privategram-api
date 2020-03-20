@@ -1,1 +1,1 @@
-web: java $JAVA_OPTS -Ddw.server.applicationConnectors[0].port=$PORT  -DPROPERTIES_FILENAME=app-prod.properties -cp target/classes:target/dependency/* com.garrettestrin.PrivateGram.app.Main server target/classes/app.yml
+web: java $JAVA_OPTS -Ddw.server.applicationConnectors[0].port=$PORT -Ddw.server.applicationConnectors[1].port=$PORT -cp target/classes:target/dependency/* com.garrettestrin.PrivateGram.app.Main server target/classes/app.yml

@@ -22,3 +22,5 @@ app-dev.properties
 \.project
 
 \.classpath
+
+.env

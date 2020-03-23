@@ -34,7 +34,7 @@ public interface CommentDao extends SqlObject {
   //  TODO: JAVADOC
   @SqlQuery("SELECT * "
           + "FROM `comments` "
-          + "WHERE post_id = :post_id AND active = 1"
+          + "WHERE post_id = :post_id AND active = 1 "
           + "LIMIT 3")
   @RegisterBeanMapper(Comment.class)
   List<Comment> getCommentsPreview(@Bind("post_id") int post_id);

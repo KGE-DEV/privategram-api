@@ -1,7 +1,10 @@
 package com.garrettestrin.PrivateGram.biz;
 
+import com.garrettestrin.PrivateGram.api.ApiObjects.Post;
 import com.garrettestrin.PrivateGram.api.ApiObjects.PostResponse;
 import com.garrettestrin.PrivateGram.data.PostDao;
+
+import java.util.List;
 
 public class PostService {
 
@@ -20,5 +23,9 @@ public class PostService {
 //    when wp is no longer encoded emojis, we need to url encode the string for db insertion
     boolean wasPostAdded = postDao.addPost(postContent, postImageUrl);
     return new PostResponse(wasPostAdded, "Posted", null);
+  }
+
+  public PostResponse getAllPosts() {
+    return new PostResponse(true, null, postDao.getAllPosts());
   }
 }

@@ -17,6 +17,7 @@ public class PostService {
   }
 
   public PostResponse addPost(String postContent, String postImageUrl) {
+//    when wp is no longer encoded emojis, we need to url encode the string for db insertion
     boolean wasPostAdded = postDao.addPost(postContent, postImageUrl);
     return new PostResponse(wasPostAdded, "Posted", null);
   }

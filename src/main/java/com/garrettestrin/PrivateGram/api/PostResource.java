@@ -7,6 +7,7 @@ import com.garrettestrin.PrivateGram.app.Auth.AuthenticatedUser;
 import com.garrettestrin.PrivateGram.biz.PostService;
 
 import javax.ws.rs.CookieParam;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -29,5 +30,12 @@ public class PostResource {
   @Timed
   public PostResponse addComment(Post p, @CookieParam(AUTH_COOKIE) AuthenticatedUser authenticatedUser) {
     return postService.addPost(p.postContent, p.postImageUrl);
+  }
+
+  @GET
+  @Path("/get/all")
+  @Timed
+  public  PostResponse getAllPosts(@CookieParam(AUTH_COOKIE) AuthenticatedUser authenticatedUser) {
+    return postService.getAllPosts();
   }
 }

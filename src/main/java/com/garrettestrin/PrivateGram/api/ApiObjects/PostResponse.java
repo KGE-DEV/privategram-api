@@ -1,6 +1,6 @@
 package com.garrettestrin.PrivateGram.api.ApiObjects;
 
-import com.garrettestrin.PrivateGram.data.DataObjects.Comment;
+import com.garrettestrin.PrivateGram.data.DataObjects.Post;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

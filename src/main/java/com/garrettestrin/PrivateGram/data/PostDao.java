@@ -20,4 +20,11 @@ public interface PostDao extends SqlObject {
           + "FROM `posts` ")
   @RegisterBeanMapper(Post.class)
   List<Post> getAllPosts();
+
+
+  @SqlQuery("SELECT * "
+          + "FROM `posts` "
+          + "LIMIT :lower_limit, 10")
+  @RegisterBeanMapper(Post.class)
+  List<Post> getPaginatedPosts(@Bind("lower_limit") int lower_limit);
 }

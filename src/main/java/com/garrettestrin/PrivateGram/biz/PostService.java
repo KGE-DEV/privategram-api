@@ -1,10 +1,7 @@
 package com.garrettestrin.PrivateGram.biz;
 
-import com.garrettestrin.PrivateGram.api.ApiObjects.Post;
 import com.garrettestrin.PrivateGram.api.ApiObjects.PostResponse;
 import com.garrettestrin.PrivateGram.data.PostDao;
-
-import java.util.List;
 
 public class PostService {
 
@@ -27,5 +24,14 @@ public class PostService {
 
   public PostResponse getAllPosts() {
     return new PostResponse(true, null, postDao.getAllPosts());
+  }
+
+  public PostResponse getPaginatedPosts(Integer lower_limit) {
+    if(lower_limit == null) {
+      lower_limit = 0;
+    } else {
+      lower_limit = lower_limit * 10;
+    }
+    return new PostResponse(true, null, postDao.getPaginatedPosts(lower_limit));
   }
 }

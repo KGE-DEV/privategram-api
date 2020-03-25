@@ -11,6 +11,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
 @Path("/post")
@@ -35,7 +36,13 @@ public class PostResource {
   @GET
   @Path("/get/all")
   @Timed
-  public  PostResponse getAllPosts(@CookieParam(AUTH_COOKIE) AuthenticatedUser authenticatedUser) {
+  public PostResponse getAllPosts(@CookieParam(AUTH_COOKIE) AuthenticatedUser authenticatedUser) {
     return postService.getAllPosts();
+  }
+
+  @GET
+  @Path("get/paginated")
+  public PostResponse getPaginatedPosts(@QueryParam("page") Integer page, @CookieParam(AUTH_COOKIE) AuthenticatedUser authenticatedUser) {
+    return postService.getPaginatedPosts(page);
   }
 }

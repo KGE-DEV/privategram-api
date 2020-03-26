@@ -24,8 +24,8 @@ public interface PostDao extends SqlObject {
 
   @SqlQuery("SELECT * "
           + "FROM `posts` "
-          + "Order by id DESC "
-          + "WHERE active = 1")
+          + "WHERE active = 1 "
+          + "Order by id DESC ")
   @RegisterBeanMapper(Post.class)
   List<Post> getAllPosts();
 

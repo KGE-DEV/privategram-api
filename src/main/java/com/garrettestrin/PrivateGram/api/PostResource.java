@@ -5,8 +5,10 @@ import com.garrettestrin.PrivateGram.api.ApiObjects.Post;
 import com.garrettestrin.PrivateGram.api.ApiObjects.PostResponse;
 import com.garrettestrin.PrivateGram.app.Auth.AuthenticatedUser;
 import com.garrettestrin.PrivateGram.biz.PostService;
+import io.dropwizard.jersey.PATCH;
 
 import javax.ws.rs.CookieParam;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -29,7 +31,7 @@ public class PostResource {
   @POST
   @Path("/add")
   @Timed
-  public PostResponse addComment(Post p, @CookieParam(AUTH_COOKIE) AuthenticatedUser authenticatedUser) {
+  public PostResponse addPost(Post p, @CookieParam(AUTH_COOKIE) AuthenticatedUser authenticatedUser) {
     return postService.addPost(p.postContent, p.postImageUrl);
   }
 
@@ -44,5 +46,19 @@ public class PostResource {
   @Path("get/paginated")
   public PostResponse getPaginatedPosts(@QueryParam("page") Integer page, @CookieParam(AUTH_COOKIE) AuthenticatedUser authenticatedUser) {
     return postService.getPaginatedPosts(page);
+  }
+
+  @PATCH
+  @Path("/edit")
+  @Timed
+  public PostResponse editPost(Post p, @CookieParam(AUTH_COOKIE) AuthenticatedUser authenticatedUser) {
+    return postService.editPost(p.postId, p.postContent);
+  }
+
+  @DELETE
+  @Path("/delete")
+  @Timed
+  public PostResponse deletePost(Post p, @CookieParam(AUTH_COOKIE) AuthenticatedUser authenticatedUser) {
+    return postService.deletePost(p.postId);
   }
 }

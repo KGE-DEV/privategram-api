@@ -17,14 +17,31 @@ public interface PostDao extends SqlObject {
   boolean addPost(@Bind("post_content") String post_content, @Bind("post_image_url") String post_image_url);
 
   @SqlQuery("SELECT * "
-          + "FROM `posts` ")
+          + "FROM `posts` "
+          + "WHERE id = :post_id")
   @RegisterBeanMapper(Post.class)
-  List<Post> getAllPosts();
-
+  List<Post> getPost(@Bind("post_id") int postId);
 
   @SqlQuery("SELECT * "
           + "FROM `posts` "
+          + "WHERE active = 1")
+  @RegisterBeanMapper(Post.class)
+  List<Post> getAllPosts();
+
+  @SqlQuery("SELECT * "
+          + "FROM `posts` "
+          + "WHERE active = 1 "
           + "LIMIT :lower_limit, 10")
   @RegisterBeanMapper(Post.class)
   List<Post> getPaginatedPosts(@Bind("lower_limit") int lower_limit);
+
+  @SqlUpdate("UPDATE `posts` "
+          + "SET post_content = :post_content "
+          + "WHERE id = :post_id")
+  boolean editPost(@Bind("post_id") int postId, @Bind("post_content") String postContent);
+
+  @SqlUpdate("UPDATE `posts` "
+          + "SET active = 0 "
+          + "WHERE id = :post_id")
+  boolean deletePost(@Bind("post_id") int postId);
 }

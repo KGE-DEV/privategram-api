@@ -37,7 +37,7 @@ public class PostService {
     if(lower_limit == null) {
       lower_limit = 0;
     } else {
-      lower_limit = lower_limit * 10;
+      lower_limit = (lower_limit - 1) * 10;
     }
     return new PostResponse(true, null, postDao.getPaginatedPosts(lower_limit));
   }

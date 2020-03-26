@@ -24,6 +24,7 @@ public interface PostDao extends SqlObject {
 
   @SqlQuery("SELECT * "
           + "FROM `posts` "
+          + "Order by id DESC "
           + "WHERE active = 1")
   @RegisterBeanMapper(Post.class)
   List<Post> getAllPosts();
@@ -31,6 +32,7 @@ public interface PostDao extends SqlObject {
   @SqlQuery("SELECT * "
           + "FROM `posts` "
           + "WHERE active = 1 "
+          + "Order by id DESC "
           + "LIMIT :lower_limit, 10")
   @RegisterBeanMapper(Post.class)
   List<Post> getPaginatedPosts(@Bind("lower_limit") int lower_limit);

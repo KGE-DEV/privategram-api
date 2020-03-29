@@ -1,7 +1,6 @@
 package com.garrettestrin.PrivateGram.data;
 
 import com.garrettestrin.PrivateGram.data.DataObjects.Comment;
-import org.hibernate.annotations.SQLDelete;
 import org.jdbi.v3.sqlobject.SqlObject;
 import org.jdbi.v3.sqlobject.config.RegisterBeanMapper;
 import org.jdbi.v3.sqlobject.customizer.Bind;
@@ -25,16 +24,16 @@ public interface CommentDao extends SqlObject {
   List<Comment> getComment(@Bind("comment_id") int comment_id);
 
 //  TODO: JAVADOC
-  @SqlQuery("SELECT * "
-            + "FROM `comments` "
-            + "WHERE post_id = :post_id AND active = 1")
+@SqlQuery("SELECT c.id, c.post_id, c.comment, u.name FROM elsiegram.comments as c "
+        + "INNER JOIN elsiegram.users as u on c.user_id = u.id "
+        + "WHERE post_id = :post_id and active = 1 ")
   @RegisterBeanMapper(Comment.class)
   List<Comment> getAllComments(@Bind("post_id") int post_id);
 
   //  TODO: JAVADOC
-  @SqlQuery("SELECT * "
-          + "FROM `comments` "
-          + "WHERE post_id = :post_id AND active = 1 "
+  @SqlQuery("SELECT c.id, c.post_id, c.comment, u.name FROM elsiegram.comments as c "
+          + "INNER JOIN elsiegram.users as u on c.user_id = u.id "
+          + "WHERE post_id = :post_id and active = 1 "
           + "LIMIT 3")
   @RegisterBeanMapper(Comment.class)
   List<Comment> getCommentsPreview(@Bind("post_id") int post_id);

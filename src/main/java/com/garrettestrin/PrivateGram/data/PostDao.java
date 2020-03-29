@@ -46,4 +46,7 @@ public interface PostDao extends SqlObject {
           + "SET active = 0 "
           + "WHERE id = :post_id")
   boolean deletePost(@Bind("post_id") int postId);
+
+  @SqlQuery("SELECT COUNT(*) FROM elsiegram.posts")
+  int postCount();
 }

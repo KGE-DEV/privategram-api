@@ -1,5 +1,6 @@
 package com.garrettestrin.PrivateGram.biz;
 
+import com.garrettestrin.PrivateGram.api.ApiObjects.PostCountResponse;
 import com.garrettestrin.PrivateGram.api.ApiObjects.PostResponse;
 import com.garrettestrin.PrivateGram.data.DataObjects.Comment;
 import com.garrettestrin.PrivateGram.data.DataObjects.Post;
@@ -51,6 +52,10 @@ public class PostService {
     boolean wasPostDeleted = postDao.deletePost(postId);
     String postDeletedMessage = wasPostDeleted ? DELETED_POST_SUCCESS : DELETED_POST_FAIL;
     return new PostResponse(wasPostDeleted, postDeletedMessage, null);
+  }
+
+  public PostCountResponse postCount() {
+    return new PostCountResponse(postDao.postCount());
   }
 
 }

@@ -2,6 +2,7 @@ package com.garrettestrin.PrivateGram.api;
 
 import com.codahale.metrics.annotation.Timed;
 import com.garrettestrin.PrivateGram.api.ApiObjects.Post;
+import com.garrettestrin.PrivateGram.api.ApiObjects.PostCountResponse;
 import com.garrettestrin.PrivateGram.api.ApiObjects.PostResponse;
 import com.garrettestrin.PrivateGram.app.Auth.AuthenticatedUser;
 import com.garrettestrin.PrivateGram.biz.PostService;
@@ -60,5 +61,12 @@ public class PostResource {
   @Timed
   public PostResponse deletePost(Post p, @CookieParam(AUTH_COOKIE) AuthenticatedUser authenticatedUser) {
     return postService.deletePost(p.postId);
+  }
+
+  @GET
+  @Path("/count")
+  @Timed
+  public PostCountResponse postCount(@CookieParam(AUTH_COOKIE) AuthenticatedUser authenticatedUser) {
+    return postService.postCount();
   }
 }

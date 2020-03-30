@@ -76,8 +76,8 @@ public class UserService {
 //        }
 //    }
 
-    public void addUser(String email, String name, String password) throws UnsupportedEncodingException {
-        userDao.registerUser(email, name, java.net.URLDecoder.decode(password, StandardCharsets.UTF_8.name()));
+    public void addUser(int id, String email, String name, String password) throws UnsupportedEncodingException {
+        userDao.registerUser(id, email, name, java.net.URLDecoder.decode(password, StandardCharsets.UTF_8.name()));
     }
 
 //    // TODO: JAVADOC

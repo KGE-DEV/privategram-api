@@ -53,7 +53,7 @@ public interface UserDao extends SqlObject {
 
     // TODO: JAVADOC
     @SqlUpdate("INSERT INTO "
-            + "users (name, email, password) "
-            + "VALUES (:name, :email, :password)")
-    boolean registerUser(@Bind("email") String email, @Bind("name") String name, @Bind("password") String password);
+            + "users (id, name, email, password) "
+            + "VALUES (:id, :name, :email, :password)")
+    boolean registerUser(@Bind("id") int id, @Bind("email") String email, @Bind("name") String name, @Bind("password") String password);
 }

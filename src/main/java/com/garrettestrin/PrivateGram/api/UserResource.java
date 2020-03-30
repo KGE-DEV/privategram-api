@@ -52,12 +52,13 @@ public class UserResource {
     @POST
     @Path("/add")
     @Timed
-    public Response addUser(@QueryParam("email") String email,
+    public Response addUser(@QueryParam("id") int id,
+                            @QueryParam("email") String email,
                             @QueryParam("name") String name,
                             @QueryParam("password") String password,
                             @QueryParam("secret") String secret) throws UnsupportedEncodingException {
         if(secret.equals(auth.SECRET_KEY)) {
-            userService.addUser(email, name, password);
+            userService.addUser(id, email, name, password);
             return Response.ok().build();
         }
         return Response.serverError().build();

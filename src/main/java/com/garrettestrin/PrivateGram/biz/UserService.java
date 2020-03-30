@@ -1,36 +1,39 @@
-//package com.garrettestrin.PrivateGram.biz;
-//
-//import com.garrettestrin.PrivateGram.api.ApiObjects.Message;
-//import com.garrettestrin.PrivateGram.api.ApiObjects.User;
-//import com.garrettestrin.PrivateGram.app.Auth.Auth;
-//import com.garrettestrin.PrivateGram.app.PrivateGramConfiguration;
-//import com.garrettestrin.PrivateGram.data.DataObjects.ResetPasswordToken;
-//import com.garrettestrin.PrivateGram.data.UserDao;
-//import io.jsonwebtoken.Claims;
-//
-//import java.util.Calendar;
-//import java.util.Date;
-//import java.util.Random;
-//
-//import static org.apache.commons.lang3.StringUtils.isEmpty;
-//
-//public class UserService {
-//
-//    private final UserDao userDao;
-//    private final Auth auth;
-//    private final PrivateGramConfiguration config;
-//    private final String AUTH_TOKEN;
-//    private final BizUtilities bizUtilities;
-//
-//    public UserService(UserDao userDao, Auth auth, PrivateGramConfiguration config) {
-//
-//        this.userDao = userDao;
-//        this.auth = auth;
-//        this.config = config;
-//        this.AUTH_TOKEN = config.getAuthToken();
-//        this.bizUtilities = new BizUtilities(config.getEmailUser(), config.getEmailHost(), config.getEmailPassword());
-//    }
-//
+package com.garrettestrin.PrivateGram.biz;
+
+import com.garrettestrin.PrivateGram.api.ApiObjects.Message;
+import com.garrettestrin.PrivateGram.api.ApiObjects.User;
+import com.garrettestrin.PrivateGram.app.Auth.Auth;
+import com.garrettestrin.PrivateGram.app.PrivateGramConfiguration;
+import com.garrettestrin.PrivateGram.biz.BizObjects.ValidatedUserInformation;
+import com.garrettestrin.PrivateGram.data.DataObjects.ResetPasswordToken;
+import com.garrettestrin.PrivateGram.data.UserDao;
+import io.jsonwebtoken.Claims;
+
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Random;
+
+import static org.apache.commons.lang3.StringUtils.isEmpty;
+
+public class UserService {
+
+    private final UserDao userDao;
+    private final Auth auth;
+    private final PrivateGramConfiguration config;
+    private final String AUTH_TOKEN;
+    private final BizUtilities bizUtilities;
+
+    public UserService(UserDao userDao, Auth auth, PrivateGramConfiguration config) {
+
+        this.userDao = userDao;
+        this.auth = auth;
+        this.config = config;
+        this.AUTH_TOKEN = config.getAuthToken();
+        this.bizUtilities = new BizUtilities(config.getEmailUser(), config.getEmailHost(), config.getEmailPassword());
+    }
+
 //    // TODO: JAVADOC
 //    // TODO: Rename Test
 //    public User getUserById(long id){
@@ -44,7 +47,7 @@
 //
 //        return userDao.getUserIdByEmail(email);
 //    }
-//
+
 //    // TODO: JAVADOC
 //    // TODO: Add test
 //    public Message loginUser(String email, String password) {
@@ -53,7 +56,7 @@
 //            return new Message("User Login", isUserVefified, 200, auth.createJWT(email, "Garrett", "user validated", -1));
 //        return new Message("User Login", isUserVefified, 200, null);
 //    }
-//
+
 //    // TODO: JAVADOC
 //    // TODO: Add test
 //    public Message registerUser(String email, String first_name, String last_name, String password) {
@@ -72,7 +75,11 @@
 //            return new Message("Something went wrong.", false, 500, null);
 //        }
 //    }
-//
+
+    public void addUser(String email, String name, String password) throws UnsupportedEncodingException {
+        userDao.registerUser(email, name, java.net.URLDecoder.decode(password, StandardCharsets.UTF_8.name()));
+    }
+
 //    // TODO: JAVADOC
 //    // TODO: Add Test
 //    public boolean verifyPassword(String email, String password) {
@@ -82,7 +89,7 @@
 //            return true;
 //        return false;
 //    }
-//
+
 //    // TODO: JAVADOC
 //    // TODO: Add Test
 //    public Message verifyToken(String token, String auth) {
@@ -100,7 +107,7 @@
 //        }
 //        return new Message("Token Verification", isVerified, 200, null);
 //    }
-//
+
 //    // TODO: JAVADOC
 //    // TODO: Add Test
 //    public Message resetPassword(String email) {
@@ -122,7 +129,7 @@
 //            message.setMessage("Password Email was not sent");
 //        return message;
 //    }
-//
+
 //    public ValidatedUserInformation validateUserInformation(String email, String first_name, String last_name, String password) {
 //        return new ValidatedUserInformation(validateEmail(email), validateName(first_name), validateName(last_name), validatePassword(password));
 //    }
@@ -163,4 +170,4 @@
 //    public Message unauthorized() {
 //        return new Message("Unauthorized", false, 401, null);
 //    }
-//}
+}

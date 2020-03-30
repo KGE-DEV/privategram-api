@@ -11,8 +11,10 @@ import com.garrettestrin.PrivateGram.app.Auth.UnauthorizedException;
 import com.garrettestrin.PrivateGram.app.Auth.UnauthorizedExceptionMapper;
 import com.garrettestrin.PrivateGram.biz.CommentService;
 import com.garrettestrin.PrivateGram.biz.PostService;
+import com.garrettestrin.PrivateGram.biz.UserService;
 import com.garrettestrin.PrivateGram.data.CommentDao;
 import com.garrettestrin.PrivateGram.data.PostDao;
+import com.garrettestrin.PrivateGram.data.UserDao;
 import com.garrettestrin.PrivateGram.health.DBHealthCheck;
 import io.dropwizard.db.DataSourceFactory;
 import io.dropwizard.jdbi3.JdbiFactory;
@@ -48,9 +50,9 @@ class DependencyManager {
 
 
         // UserResource
-        // final UserDao userDao = db.onDemand(UserDao.class);
-        // val userService = new UserService(userDao, auth, config);
-        userResource = new UserResource(auth);
+         final UserDao userDao = db.onDemand(UserDao.class);
+         val userService = new UserService(userDao, auth, config);
+        userResource = new UserResource(auth, userService);
         // CommentResource
         final CommentDao commentDao = db.onDemand(CommentDao.class);
         val commentService = new CommentService(commentDao);

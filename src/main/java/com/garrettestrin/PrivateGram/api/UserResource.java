@@ -7,20 +7,23 @@ import com.garrettestrin.PrivateGram.api.ApiObjects.Message;
 import com.garrettestrin.PrivateGram.api.ApiObjects.User;
 import com.garrettestrin.PrivateGram.app.Auth.Auth;
 import com.garrettestrin.PrivateGram.app.Auth.AuthenticatedUser;
+import com.garrettestrin.PrivateGram.biz.UserService;
 //import com.garrettestrin.PrivateGram.biz.UserService;
 
 // TODO: fix this import
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import java.io.UnsupportedEncodingException;
 
 @Path("/user")
 @Produces(MediaType.APPLICATION_JSON)
 public class UserResource {
-
+    private UserService userService;
     private Auth auth;
 
-    public UserResource(Auth auth) {
-
+    public UserResource(Auth auth, UserService userService) {
+        this.userService = userService;
         this.auth = auth;
     }
 
@@ -33,8 +36,8 @@ public class UserResource {
         return new JWTToken(auth.createJWT(userId, "garrett.estrin.com", "elsie_gram_auth", -1));
     }
 
-    // TODO: JAVADOC
-    // TODO: add error handling
+//    // TODO: JAVADOC
+//    // TODO: add error handling
 //    @POST
 //    @Path("/register")
 //    @Timed
@@ -45,6 +48,20 @@ public class UserResource {
 //
 //        return userService.registerUser(email, first_name, last_name, password);
 //    }
+
+    @POST
+    @Path("/add")
+    @Timed
+    public Response addUser(@QueryParam("email") String email,
+                            @QueryParam("name") String name,
+                            @QueryParam("password") String password,
+                            @QueryParam("secret") String secret) throws UnsupportedEncodingException {
+        if(secret.equals(auth.SECRET_KEY)) {
+            userService.addUser(email, name, password);
+            return Response.ok().build();
+        }
+        return Response.serverError().build();
+    }
 
     // TODO: JAVADOC
     // TODO: add error handling

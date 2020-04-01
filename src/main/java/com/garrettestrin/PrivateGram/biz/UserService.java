@@ -170,4 +170,12 @@ public class UserService {
 //    public Message unauthorized() {
 //        return new Message("Unauthorized", false, 401, null);
 //    }
+
+    public String getUserRole(String id) {
+        String role = userDao.getUserRole(id);
+        if(role.isEmpty()) {
+            role = "subscriber";
+        }
+        return role;
+    }
 }

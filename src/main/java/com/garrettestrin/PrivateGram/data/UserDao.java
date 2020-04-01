@@ -56,4 +56,7 @@ public interface UserDao extends SqlObject {
             + "users (id, name, email, password) "
             + "VALUES (:id, :name, :email, :password)")
     boolean registerUser(@Bind("id") int id, @Bind("email") String email, @Bind("name") String name, @Bind("password") String password);
+
+    @SqlQuery("SELECT role FROM users WHERE id = :user_id")
+    String getUserRole(@Bind("user_id") String id);
 }

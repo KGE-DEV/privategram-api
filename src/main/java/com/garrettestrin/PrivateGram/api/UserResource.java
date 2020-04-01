@@ -1,17 +1,18 @@
 package com.garrettestrin.PrivateGram.api;
 
 import com.codahale.metrics.annotation.Timed;
-import com.garrettestrin.PrivateGram.api.ApiObjects.CommentResponse;
-import com.garrettestrin.PrivateGram.api.ApiObjects.JWTToken;
-import com.garrettestrin.PrivateGram.api.ApiObjects.Message;
-import com.garrettestrin.PrivateGram.api.ApiObjects.User;
+import com.garrettestrin.PrivateGram.api.ApiObjects.*;
 import com.garrettestrin.PrivateGram.app.Auth.Auth;
 import com.garrettestrin.PrivateGram.app.Auth.AuthenticatedUser;
 import com.garrettestrin.PrivateGram.biz.UserService;
 //import com.garrettestrin.PrivateGram.biz.UserService;
 
-// TODO: fix this import
-import javax.ws.rs.*;
+import javax.ws.rs.CookieParam;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.UnsupportedEncodingException;
@@ -21,6 +22,8 @@ import java.io.UnsupportedEncodingException;
 public class UserResource {
     private UserService userService;
     private Auth auth;
+
+    private final String AUTH_COOKIE = "elsie_gram_auth";
 
     public UserResource(Auth auth, UserService userService) {
         this.userService = userService;
@@ -92,4 +95,12 @@ public class UserResource {
 //                               @QueryParam("Auth") String auth) {
 //        return userService.verifyToken(token, auth);
 //    }
+
+    @GET
+    @Path("/get/role")
+    @Timed
+    public UserResponse getUserRole(@CookieParam(AUTH_COOKIE) AuthenticatedUser authenticatedUser) {
+        String role = userService.getUserRole(authenticatedUser.getUserId());
+        return UserResponse.builder().success(true).role(role).build();
+    }
 }

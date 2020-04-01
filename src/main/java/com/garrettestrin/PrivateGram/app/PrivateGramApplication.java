@@ -1,6 +1,5 @@
 package com.garrettestrin.PrivateGram.app;
 
-import com.garrettestrin.PrivateGram.app.Auth.UnauthorizedExceptionMapper;
 import io.dropwizard.Application;
 import io.dropwizard.configuration.ConfigurationSourceProvider;
 import io.dropwizard.configuration.EnvironmentVariableSubstitutor;
@@ -42,6 +41,8 @@ public class PrivateGramApplication extends Application<PrivateGramConfiguration
 
         environment.jersey().register(deps.authenticatedUserConverterProvider);
         environment.jersey().register(deps.unauthorizedExceptionMapper);
+
+        Cors.insecure(environment);
     }
 
 }

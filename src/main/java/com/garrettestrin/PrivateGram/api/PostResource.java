@@ -8,14 +8,9 @@ import com.garrettestrin.PrivateGram.app.Auth.AuthenticatedUser;
 import com.garrettestrin.PrivateGram.biz.PostService;
 import io.dropwizard.jersey.PATCH;
 
-import javax.ws.rs.CookieParam;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import org.jboss.logging.Param;
 
 @Path("/post")
 @Produces(MediaType.APPLICATION_JSON)
@@ -27,15 +22,23 @@ public class PostResource {
   public PostResource(PostService postService) {
     this.postService = postService;
   }
-  // TODO: JAVADOC
-  // TODO: add error handling
+
+  /**
+   * @param post
+   * @param authenticatedUser
+   * @return PostResponse
+   */
   @POST
   @Path("/add")
   @Timed
-  public PostResponse addPost(Post p, @CookieParam(AUTH_COOKIE) AuthenticatedUser authenticatedUser) {
-    return postService.addPost(p.postContent, p.postImageUrl);
+  public PostResponse addPost(Post post, @CookieParam(AUTH_COOKIE) AuthenticatedUser authenticatedUser) {
+    return postService.addPost(post.postContent, post.postImageUrl);
   }
 
+  /**
+   * @param authenticatedUser
+   * @return PostResponse
+   */
   @GET
   @Path("/get/all")
   @Timed
@@ -43,17 +46,23 @@ public class PostResource {
     return postService.getAllPosts();
   }
 
+
+  /**
+   * @param page
+   * @param authenticatedUser
+   * @return PostResponse
+   */
   @GET
-  @Path("get/paginated")
-  public PostResponse getPaginatedPosts(@QueryParam("page") Integer page, @CookieParam(AUTH_COOKIE) AuthenticatedUser authenticatedUser) {
+  @Path("get/paginated/{page}")
+  public PostResponse getPaginatedPosts(@PathParam("page") Integer page, @CookieParam(AUTH_COOKIE) AuthenticatedUser authenticatedUser) {
     return postService.getPaginatedPosts(page);
   }
 
   @PATCH
   @Path("/edit")
   @Timed
-  public PostResponse editPost(Post p, @CookieParam(AUTH_COOKIE) AuthenticatedUser authenticatedUser) {
-    return postService.editPost(p.postId, p.postContent);
+  public PostResponse editPost(Post post, @CookieParam(AUTH_COOKIE) AuthenticatedUser authenticatedUser) {
+    return postService.editPost(post.postId, post.postContent);
   }
 
   @DELETE

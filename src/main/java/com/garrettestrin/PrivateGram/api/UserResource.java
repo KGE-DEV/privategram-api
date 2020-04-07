@@ -101,6 +101,6 @@ public class UserResource {
     @Timed
     public UserResponse getUserRole(@CookieParam(AUTH_COOKIE) AuthenticatedUser authenticatedUser) {
         String role = userService.getUserRole(authenticatedUser.getUserId());
-        return UserResponse.builder().success(true).role(role).build();
+        return UserResponse.builder().success(true).role(role).id(authenticatedUser.getUserId()).build();
     }
 }

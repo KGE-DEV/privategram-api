@@ -12,4 +12,5 @@ import lombok.NoArgsConstructor;
 public class UserResponse {
   boolean success;
   String role;
+  String id;
 }

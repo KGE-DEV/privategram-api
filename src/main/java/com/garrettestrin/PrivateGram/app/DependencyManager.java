@@ -1,18 +1,19 @@
 package com.garrettestrin.PrivateGram.app;
 
 import com.codahale.metrics.health.HealthCheck;
-import com.garrettestrin.PrivateGram.api.ApiObjects.Post;
 import com.garrettestrin.PrivateGram.api.CommentResource;
+import com.garrettestrin.PrivateGram.api.EventResource;
 import com.garrettestrin.PrivateGram.api.PostResource;
 import com.garrettestrin.PrivateGram.api.UserResource;
 import com.garrettestrin.PrivateGram.app.Auth.Auth;
 import com.garrettestrin.PrivateGram.app.Auth.AuthenticatedUserConverterProvider;
-import com.garrettestrin.PrivateGram.app.Auth.UnauthorizedException;
 import com.garrettestrin.PrivateGram.app.Auth.UnauthorizedExceptionMapper;
 import com.garrettestrin.PrivateGram.biz.CommentService;
+import com.garrettestrin.PrivateGram.biz.EventService;
 import com.garrettestrin.PrivateGram.biz.PostService;
 import com.garrettestrin.PrivateGram.biz.UserService;
 import com.garrettestrin.PrivateGram.data.CommentDao;
+import com.garrettestrin.PrivateGram.data.EventDao;
 import com.garrettestrin.PrivateGram.data.PostDao;
 import com.garrettestrin.PrivateGram.data.UserDao;
 import com.garrettestrin.PrivateGram.health.DBHealthCheck;
@@ -37,6 +38,7 @@ class DependencyManager {
     public final UserResource userResource;
     public final CommentResource commentResource;
     public final PostResource postResource;
+    public final EventResource eventResouce;
     public final AuthenticatedUserConverterProvider authenticatedUserConverterProvider;
     public final UnauthorizedExceptionMapper unauthorizedExceptionMapper;
 
@@ -62,6 +64,11 @@ class DependencyManager {
         final PostDao postDao = db.onDemand(PostDao.class);
         val postService = new PostService(postDao);
         postResource = new PostResource(postService);
+
+        // EventResource
+        final EventDao eventDao = db.onDemand(EventDao.class);
+        val eventService = new EventService(eventDao);
+        eventResouce = new EventResource(eventService);
 
         authenticatedUserConverterProvider = new AuthenticatedUserConverterProvider(config);
         unauthorizedExceptionMapper = new UnauthorizedExceptionMapper();

@@ -7,8 +7,8 @@ import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 public interface EventDao extends SqlObject {
 
   @SqlUpdate("INSERT INTO "
-          + "`user_events` (`user_id`, `event`, `page`) "
-          + "VALUES (:user_id, :event, :page);")
-  void saveEvent(@Bind("user_id") int userId, @Bind("event") String event, @Bind("page") String page);
+          + "`user_events` (`user_id`, `event`, `page`, `meta`) "
+          + "VALUES (:user_id, :event, :page, :meta);")
+  void saveEvent(@Bind("user_id") int userId, @Bind("event") String event, @Bind("page") String page, @Bind("meta") String meta);
 
 }

@@ -12,6 +12,6 @@ public class EventService {
   }
 
   public void saveEvent(Event event) {
-    eventDao.saveEvent(event.getUserId(), event.getEvent(), event.getPage());
+    eventDao.saveEvent(event.getUserId(), event.getEvent(), event.getPage(), event.getMeta());
   }
 }

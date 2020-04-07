@@ -15,4 +15,6 @@ public class Event {
   String event;
   @JsonProperty("page")
   String page;
+  @JsonProperty("meta")
+  String meta;
 }

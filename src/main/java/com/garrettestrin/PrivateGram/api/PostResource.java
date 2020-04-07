@@ -8,9 +8,14 @@ import com.garrettestrin.PrivateGram.app.Auth.AuthenticatedUser;
 import com.garrettestrin.PrivateGram.biz.PostService;
 import io.dropwizard.jersey.PATCH;
 
-import javax.ws.rs.*;
+import javax.ws.rs.CookieParam;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-import org.jboss.logging.Param;
 
 @Path("/post")
 @Produces(MediaType.APPLICATION_JSON)

@@ -38,6 +38,7 @@ public class PrivateGramApplication extends Application<PrivateGramConfiguration
         environment.jersey().register(deps.userResource);
         environment.jersey().register(deps.commentResource);
         environment.jersey().register(deps.postResource);
+        environment.jersey().register(deps.eventResouce);
 
         environment.jersey().register(deps.authenticatedUserConverterProvider);
         environment.jersey().register(deps.unauthorizedExceptionMapper);

@@ -1,8 +1,10 @@
 package com.garrettestrin.PrivateGram.app;
 
 import com.codahale.metrics.health.HealthCheck;
+import com.garrettestrin.PrivateGram.api.ApiObjects.Event;
 import com.garrettestrin.PrivateGram.api.ApiObjects.Post;
 import com.garrettestrin.PrivateGram.api.CommentResource;
+import com.garrettestrin.PrivateGram.api.EventResource;
 import com.garrettestrin.PrivateGram.api.PostResource;
 import com.garrettestrin.PrivateGram.api.UserResource;
 import com.garrettestrin.PrivateGram.app.Auth.Auth;
@@ -37,6 +39,7 @@ class DependencyManager {
     public final UserResource userResource;
     public final CommentResource commentResource;
     public final PostResource postResource;
+    public final EventResource eventResouce;
     public final AuthenticatedUserConverterProvider authenticatedUserConverterProvider;
     public final UnauthorizedExceptionMapper unauthorizedExceptionMapper;
 
@@ -62,6 +65,8 @@ class DependencyManager {
         final PostDao postDao = db.onDemand(PostDao.class);
         val postService = new PostService(postDao);
         postResource = new PostResource(postService);
+
+        eventResouce = new EventResource();
 
         authenticatedUserConverterProvider = new AuthenticatedUserConverterProvider(config);
         unauthorizedExceptionMapper = new UnauthorizedExceptionMapper();

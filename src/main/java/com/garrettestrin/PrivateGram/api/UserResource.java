@@ -1,21 +1,21 @@
 package com.garrettestrin.PrivateGram.api;
 
 import com.codahale.metrics.annotation.Timed;
-import com.garrettestrin.PrivateGram.api.ApiObjects.*;
+import com.garrettestrin.PrivateGram.api.ApiObjects.JWTToken;
+import com.garrettestrin.PrivateGram.api.ApiObjects.UserResponse;
 import com.garrettestrin.PrivateGram.app.Auth.Auth;
 import com.garrettestrin.PrivateGram.app.Auth.AuthenticatedUser;
 import com.garrettestrin.PrivateGram.biz.UserService;
-//import com.garrettestrin.PrivateGram.biz.UserService;
-
-import javax.ws.rs.CookieParam;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.io.UnsupportedEncodingException;
+
+//import com.garrettestrin.PrivateGram.biz.UserService;
 
 @Path("/user")
 @Produces(MediaType.APPLICATION_JSON)
@@ -32,7 +32,7 @@ public class UserResource {
 
     @POST
     @Path("/create/token")
-    public JWTToken getToken(@QueryParam("secret") String secret, @QueryParam("user_id") String userId) {
+    public JWTToken getToken(@QueryParam("secret") String secret, @QueryParam("user_id") int userId) {
         if(!secret.equals(auth.SECRET_KEY)) {
             return new JWTToken(null);
         }
@@ -69,14 +69,16 @@ public class UserResource {
 
     // TODO: JAVADOC
     // TODO: add error handling
-//    @POST
-//    @Path("/login")
-//    @Timed
-//    public Message registerUser(@QueryParam("email") String email,
-//                                @QueryParam("password") String password) {
-//
-//        return userService.loginUser(email, password);
-//    }
+    @POST
+    @Path("/login")
+    @Timed
+    public UserResponse registerUser(@QueryParam("email") String email,
+                                @QueryParam("password") String password,
+                                 @Context HttpServletResponse response,
+                                 @Context HttpServletRequest request) throws IOException {
+
+        return userService.loginUser(email, password, response, request);
+    }
 //
 //    // TODO: JAVADOC
 //    // TODO: add error handling

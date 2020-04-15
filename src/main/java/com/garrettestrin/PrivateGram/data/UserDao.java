@@ -1,15 +1,11 @@
 package com.garrettestrin.PrivateGram.data;
 
-import com.garrettestrin.PrivateGram.api.ApiObjects.User;
-import com.garrettestrin.PrivateGram.data.DataObjects.ResetPasswordToken;
-import org.hibernate.annotations.SQLUpdate;
+import com.garrettestrin.PrivateGram.data.DataObjects.User;
 import org.jdbi.v3.sqlobject.SqlObject;
 import org.jdbi.v3.sqlobject.config.RegisterBeanMapper;
 import org.jdbi.v3.sqlobject.customizer.Bind;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
-
-import java.util.Date;
 
 public interface UserDao extends SqlObject {
 
@@ -58,5 +54,11 @@ public interface UserDao extends SqlObject {
     boolean registerUser(@Bind("id") int id, @Bind("email") String email, @Bind("name") String name, @Bind("password") String password);
 
     @SqlQuery("SELECT role FROM users WHERE id = :user_id")
-    String getUserRole(@Bind("user_id") String id);
+    String getUserRole(@Bind("user_id") int id);
+
+    @SqlQuery("SELECT * "
+    +   "FROM users "
+    +   "WHERE email = :email")
+    @RegisterBeanMapper(User.class)
+  User getUserByEmail(@Bind("email") String email);
 }

@@ -63,7 +63,7 @@ public class Auth {
         }
     }
 
-    public static String createJWT(String userId, String issuer, String subject, long ttlMillis) {
+    public static String createJWT(int userId, String issuer, String subject, long ttlMillis) {
 
         //The JWT signature algorithm we will be using to sign the token
         SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
@@ -76,7 +76,7 @@ public class Auth {
         Key signingKey = new SecretKeySpec(apiKeySecretBytes, signatureAlgorithm.getJcaName());
 
         //Let's set the JWT Claims
-        JwtBuilder builder = Jwts.builder().setId(userId)
+        JwtBuilder builder = Jwts.builder().setId(String.valueOf(userId))
                 .setIssuedAt(now)
                 .setSubject(subject)
                 .setIssuer(issuer)

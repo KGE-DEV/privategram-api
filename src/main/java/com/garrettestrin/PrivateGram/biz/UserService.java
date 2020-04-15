@@ -1,21 +1,26 @@
 package com.garrettestrin.PrivateGram.biz;
 
-import com.garrettestrin.PrivateGram.api.ApiObjects.Message;
-import com.garrettestrin.PrivateGram.api.ApiObjects.User;
+import com.garrettestrin.PrivateGram.api.ApiObjects.JWTToken;
+import com.garrettestrin.PrivateGram.api.ApiObjects.UserResponse;
 import com.garrettestrin.PrivateGram.app.Auth.Auth;
 import com.garrettestrin.PrivateGram.app.PrivateGramConfiguration;
-import com.garrettestrin.PrivateGram.biz.BizObjects.ValidatedUserInformation;
-import com.garrettestrin.PrivateGram.data.DataObjects.ResetPasswordToken;
+import com.garrettestrin.PrivateGram.data.DataObjects.User;
 import com.garrettestrin.PrivateGram.data.UserDao;
-import io.jsonwebtoken.Claims;
-
+import com.google.common.base.Charsets;
+import com.google.common.io.CharStreams;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Random;
-
-import static org.apache.commons.lang3.StringUtils.isEmpty;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 public class UserService {
 
@@ -24,6 +29,10 @@ public class UserService {
     private final PrivateGramConfiguration config;
     private final String AUTH_TOKEN;
     private final BizUtilities bizUtilities;
+    private final String wpUrl;
+
+    private final String AUTH_COOKIE = "elsie_gram_auth";
+    private int TEN_YEARS_IN_SECONDS = 10 * 365 * 24 * 60 * 60;
 
     public UserService(UserDao userDao, Auth auth, PrivateGramConfiguration config) {
 
@@ -32,6 +41,7 @@ public class UserService {
         this.config = config;
         this.AUTH_TOKEN = config.getAuthToken();
         this.bizUtilities = new BizUtilities(config.getEmailUser(), config.getEmailHost(), config.getEmailPassword());
+        this.wpUrl = config.getWpUrl();
     }
 
 //    // TODO: JAVADOC
@@ -48,14 +58,34 @@ public class UserService {
 //        return userDao.getUserIdByEmail(email);
 //    }
 
-//    // TODO: JAVADOC
-//    // TODO: Add test
-//    public Message loginUser(String email, String password) {
-//        boolean isUserVefified = verifyPassword(email, password);
-//        if(isUserVefified)
-//            return new Message("User Login", isUserVefified, 200, auth.createJWT(email, "Garrett", "user validated", -1));
-//        return new Message("User Login", isUserVefified, 200, null);
-//    }
+    // TODO: JAVADOC
+    // TODO: Add test
+    public UserResponse loginUser(String email, String password, HttpServletResponse response, HttpServletRequest request) throws IOException {
+        User user = userDao.getUserByEmail(email);
+        if(user == null) {
+            return UserResponse.builder().success(false).build();
+        }
+        if(user.wp_pass) {
+            URL url = new URL(wpUrl + "?action=microservice_login&email=" + email + "&password=" + password);
+            InputStream is = url.openStream();
+            try {
+                String resultFromWP = CharStreams.toString(new InputStreamReader(
+                        is, Charsets.UTF_8));
+                JsonParser parser = new JsonParser();
+                JsonElement jsonTree = parser.parse(resultFromWP);
+                JsonObject jsonObject = jsonTree.getAsJsonObject();
+                boolean success = jsonObject.get("success").getAsBoolean();
+                if(success) {
+                    setAuthCookie(request, response, user.id);
+                }
+                return UserResponse.builder().success(success).id(user.id).role(user.role).build();
+            } finally {
+                is.close();
+            }
+        } else {
+            return UserResponse.builder().success(true).id(user.id).role(user.role).build();
+        }
+    }
 
 //    // TODO: JAVADOC
 //    // TODO: Add test
@@ -171,11 +201,26 @@ public class UserService {
 //        return new Message("Unauthorized", false, 401, null);
 //    }
 
-    public String getUserRole(String id) {
+    public String getUserRole(int id) {
         String role = userDao.getUserRole(id);
         if(role.isEmpty()) {
             role = "subscriber";
         }
         return role;
+    }
+
+    private void setAuthCookie(HttpServletRequest request,  HttpServletResponse response, int userId) throws MalformedURLException {
+        Cookie authCookie = new Cookie(AUTH_COOKIE, new JWTToken(auth.createJWT(userId, "garrett.estrin.com", "elsie_gram_auth", -1)).getToken());
+        authCookie.setMaxAge(TEN_YEARS_IN_SECONDS);
+        authCookie.setPath("/");
+        String domain = new URL(request.getRequestURL().toString()).getHost();
+        if(!domain.equals("localhost")) {
+            domain = ".elsiegram.com";
+            authCookie.isHttpOnly();
+            authCookie.setSecure(true);
+        }
+        authCookie.setDomain(domain);
+
+        response.addCookie(authCookie);
     }
 }

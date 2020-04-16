@@ -9,6 +9,7 @@ import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import lombok.extern.jbosslog.JBossLog;
 import lombok.val;
+import org.glassfish.jersey.media.multipart.MultiPartFeature;
 
 @JBossLog
 public class PrivateGramApplication extends Application<PrivateGramConfiguration> {
@@ -42,6 +43,9 @@ public class PrivateGramApplication extends Application<PrivateGramConfiguration
 
         environment.jersey().register(deps.authenticatedUserConverterProvider);
         environment.jersey().register(deps.unauthorizedExceptionMapper);
+
+//        final ResourceConfig resourceConfig = new ResourceConfig(PostResource.class);
+        environment.jersey().register(MultiPartFeature.class);
 
         Cors.insecure(environment);
     }

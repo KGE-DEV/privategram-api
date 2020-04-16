@@ -1,5 +1,6 @@
 package com.garrettestrin.PrivateGram.app;
 
+import com.garrettestrin.PrivateGram.app.Config.AWSConfig;
 import io.dropwizard.Configuration;
 import io.dropwizard.db.DataSourceFactory;
 import javax.validation.Valid;
@@ -33,4 +34,10 @@ public class PrivateGramConfiguration extends Configuration {
     @Valid
     @NotNull
     private String wpUrl;
+
+    @Valid
+    private AWSConfig awsConfig;
+
+    @Valid
+    private String tinypngKey;
 }

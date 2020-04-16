@@ -1,30 +1,56 @@
 package com.garrettestrin.PrivateGram.biz;
 
+import com.amazonaws.AmazonServiceException;
+import com.amazonaws.SdkClientException;
+import com.amazonaws.auth.AWSStaticCredentialsProvider;
+import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.regions.Regions;
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3ClientBuilder;
+import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.amazonaws.util.IOUtils;
 import com.garrettestrin.PrivateGram.api.ApiObjects.PostCountResponse;
 import com.garrettestrin.PrivateGram.api.ApiObjects.PostResponse;
-import com.garrettestrin.PrivateGram.data.DataObjects.Comment;
+import com.garrettestrin.PrivateGram.app.Config.AWSConfig;
 import com.garrettestrin.PrivateGram.data.DataObjects.Post;
 import com.garrettestrin.PrivateGram.data.PostDao;
-
+import com.tinify.Options;
+import com.tinify.Source;
+import com.tinify.Tinify;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
+import javax.imageio.ImageIO;
 
 public class PostService {
 
   private final PostDao postDao;
+  private final AWSConfig awsConfig;
+  private final Regions regions;
 
   private final String DELETED_POST_SUCCESS = "post was deleted";
   private final String DELETED_POST_FAIL = "post was not deleted";
   private final String EDITED_POST_SUCCESS = "post was edited";
   private final String EDITED_POST_FAIL = "post was not edited";
+  private final String tinifyKey;
 
-  public PostService(PostDao postDao) {
+  public PostService(PostDao postDao, AWSConfig awsConfig, String tinifyKey) {
+
     this.postDao = postDao;
+    this.awsConfig = awsConfig;
+    this.regions = Regions.fromName(awsConfig.getS3Region());
+    this.tinifyKey = tinifyKey;
   }
 
-  public PostResponse addPost(String postContent, String postImageUrl) {
+  public PostResponse addPost(String caption, InputStream inputStream, String name, String type) throws IOException {
 
-//    when wp is no longer encoded emojis, we need to url encode the string for db insertion
-    boolean wasPostAdded = postDao.addPost(postContent, postImageUrl);
+    String filePath = writeStreamToFile(inputStream, name);
+    String urlString = uploadToS3(resizeAndCompressImage(name), type, name);
+    boolean wasPostAdded = postDao.addPost(caption, awsConfig.getBucketUrl() + "/" + urlString);
     return new PostResponse(wasPostAdded, "Posted", null);
   }
 
@@ -56,6 +82,61 @@ public class PostService {
 
   public PostCountResponse postCount() {
     return new PostCountResponse(postDao.postCount());
+  }
+
+  private String uploadToS3(String fileName, String type, String name) {
+
+    try {
+      BasicAWSCredentials awsCreds = new BasicAWSCredentials(awsConfig.getS3AccessKey(), awsConfig.getS3SecretKey());
+      AmazonS3 s3Client = AmazonS3ClientBuilder.standard()
+              .withRegion(regions)
+              .withCredentials(new AWSStaticCredentialsProvider(awsCreds))
+              .build();
+      // Upload a file as a new object with ContentType and title specified.
+      String urlName = System.currentTimeMillis() + "_" + name;
+      PutObjectRequest request = new PutObjectRequest(awsConfig.getBucket(), urlName, new File(fileName));
+      ObjectMetadata metadata = new ObjectMetadata();
+      metadata.setContentType(type);
+      request.setMetadata(metadata);
+      s3Client.putObject(request);
+      return urlName;
+    } catch (AmazonServiceException e) {
+      // The call was transmitted successfully, but Amazon S3 couldn't process
+      // it, so it returned an error response.
+      e.printStackTrace();
+    } catch (SdkClientException e) {
+      // Amazon S3 couldn't be contacted for a response, or the client
+      // couldn't parse the response from Amazon S3.
+      e.printStackTrace();
+    }
+    return fileName;
+  }
+
+  private String writeStreamToFile(InputStream inputStream, String name) throws IOException {
+    File directory = new File("tmp");
+    if (! directory.exists()) {
+      directory.mkdir();
+    }
+    byte[] bytes = IOUtils.toByteArray(inputStream);
+    String pathName = "tmp/" + name;
+    File file = new File(pathName);
+    BufferedImage img = ImageIO.read(new ByteArrayInputStream(bytes));
+    String[] typeArray = name.split("\\.");
+    String type = typeArray[1].toUpperCase();
+    ImageIO.write(img, type, file);
+    return pathName;
+  }
+
+  private String resizeAndCompressImage(String name) throws IOException {
+    Tinify.setKey(tinifyKey);
+    String pathToFile = "tmp/" + name;
+    Source source = Tinify.fromFile(pathToFile);
+    Options options = new Options()
+            .with("method", "scale")
+            .with("width", 500);
+    Source resized = source.resize(options);
+    resized.toFile(pathToFile);
+    return pathToFile;
   }
 
 }

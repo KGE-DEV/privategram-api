@@ -7,15 +7,14 @@ import com.garrettestrin.PrivateGram.api.ApiObjects.PostResponse;
 import com.garrettestrin.PrivateGram.app.Auth.AuthenticatedUser;
 import com.garrettestrin.PrivateGram.biz.PostService;
 import io.dropwizard.jersey.PATCH;
-
-import javax.ws.rs.CookieParam;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+import java.io.IOException;
+import java.io.InputStream;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
+import org.glassfish.jersey.media.multipart.FormDataParam;
+
+import static javax.ws.rs.core.MediaType.MULTIPART_FORM_DATA;
 
 @Path("/post")
 @Produces(MediaType.APPLICATION_JSON)
@@ -29,15 +28,23 @@ public class PostResource {
   }
 
   /**
-   * @param post
+   * @param fileInputStream
    * @param authenticatedUser
+   * @param caption
    * @return PostResponse
    */
   @POST
   @Path("/add")
   @Timed
-  public PostResponse addPost(Post post, @CookieParam(AUTH_COOKIE) AuthenticatedUser authenticatedUser) {
-    return postService.addPost(post.postContent, post.postImageUrl);
+  @Consumes(MULTIPART_FORM_DATA)
+  public PostResponse addPost(
+          @FormDataParam("caption") String caption,
+          @FormDataParam("file") final InputStream fileInputStream,
+          @FormDataParam("file") final FormDataContentDisposition contentDispositionHeader,
+          @FormDataParam("name") String name,
+          @FormDataParam("type") String type,
+          @CookieParam(AUTH_COOKIE) AuthenticatedUser authenticatedUser) throws IOException {
+    return postService.addPost(caption, fileInputStream, name, type);
   }
 
   /**

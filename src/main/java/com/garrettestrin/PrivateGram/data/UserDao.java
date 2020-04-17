@@ -61,4 +61,9 @@ public interface UserDao extends SqlObject {
     +   "WHERE email = :email")
     @RegisterBeanMapper(User.class)
   User getUserByEmail(@Bind("email") String email);
+
+  @SqlUpdate("INSERT INTO "
+          + "invites (name, email) "
+          + "VALUES (:name, :email)")
+  boolean saveInvite(@Bind("email") String email, @Bind("name") String name);
 }

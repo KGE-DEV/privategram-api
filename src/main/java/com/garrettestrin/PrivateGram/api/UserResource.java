@@ -1,6 +1,7 @@
 package com.garrettestrin.PrivateGram.api;
 
 import com.codahale.metrics.annotation.Timed;
+import com.garrettestrin.PrivateGram.api.ApiObjects.Invite;
 import com.garrettestrin.PrivateGram.api.ApiObjects.JWTToken;
 import com.garrettestrin.PrivateGram.api.ApiObjects.UserResponse;
 import com.garrettestrin.PrivateGram.app.Auth.Auth;
@@ -58,10 +59,9 @@ public class UserResource {
     public Response addUser(@QueryParam("id") int id,
                             @QueryParam("email") String email,
                             @QueryParam("name") String name,
-                            @QueryParam("password") String password,
                             @QueryParam("secret") String secret) throws UnsupportedEncodingException {
         if(secret.equals(auth.SECRET_KEY)) {
-            userService.addUser(id, email, name, password);
+            userService.addUser(id, email, name);
             return Response.ok().build();
         }
         return Response.serverError().build();
@@ -97,6 +97,13 @@ public class UserResource {
 //                               @QueryParam("Auth") String auth) {
 //        return userService.verifyToken(token, auth);
 //    }
+
+    @POST
+    @Path("/request/invite")
+    @Timed
+    public UserResponse requestInvite(Invite invite) {
+        return userService.requestInvite(invite);
+    }
 
     @GET
     @Path("/get/role")

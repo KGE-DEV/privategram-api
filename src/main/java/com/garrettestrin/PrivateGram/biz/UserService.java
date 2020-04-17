@@ -1,5 +1,6 @@
 package com.garrettestrin.PrivateGram.biz;
 
+import com.garrettestrin.PrivateGram.api.ApiObjects.Invite;
 import com.garrettestrin.PrivateGram.api.ApiObjects.JWTToken;
 import com.garrettestrin.PrivateGram.api.ApiObjects.UserResponse;
 import com.garrettestrin.PrivateGram.app.Auth.Auth;
@@ -14,10 +15,10 @@ import com.google.gson.JsonParser;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
+import java.nio.charset.Charset;
+import java.util.Random;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -106,8 +107,8 @@ public class UserService {
 //        }
 //    }
 
-    public void addUser(int id, String email, String name, String password) throws UnsupportedEncodingException {
-        userDao.registerUser(id, email, name, java.net.URLDecoder.decode(password, StandardCharsets.UTF_8.name()));
+    public void addUser(int id, String email, String name) {
+        userDao.registerUser(id, email, name, generateRandomPassword());
     }
 
 //    // TODO: JAVADOC
@@ -209,6 +210,17 @@ public class UserService {
         return role;
     }
 
+    public UserResponse requestInvite(Invite invite) {
+        try {
+            userDao.saveInvite(invite.email, invite.name);
+            bizUtilities.sendInviteRequestedEmail();
+            return UserResponse.builder().success(true).build();
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+        }
+        return UserResponse.builder().success(false).build();
+    }
+
     private void setAuthCookie(HttpServletRequest request,  HttpServletResponse response, int userId) throws MalformedURLException {
         Cookie authCookie = new Cookie(AUTH_COOKIE, new JWTToken(auth.createJWT(userId, "garrett.estrin.com", "elsie_gram_auth", -1)).getToken());
         authCookie.setMaxAge(TEN_YEARS_IN_SECONDS);
@@ -222,5 +234,11 @@ public class UserService {
         authCookie.setDomain(domain);
 
         response.addCookie(authCookie);
+    }
+
+    private String generateRandomPassword() {
+        byte[] array = new byte[7]; // length is bounded by 7
+        new Random().nextBytes(array);
+        return new String(array, Charset.forName("UTF-8"));
     }
 }

@@ -125,7 +125,7 @@ public class UserService {
     public UserResponse resetPassword(String email, String password, String token) {
         boolean wasPasswordReset = false;
         ResetPasswordToken resetPasswordToken = userDao.checkForExistingResetToken(email);
-        if(resetPasswordToken.token.equals(token)) {
+        if(resetPasswordToken != null && resetPasswordToken.token.equals(token)) {
             wasPasswordReset = userDao.resetPassword(email, auth.hashPassword(password));
             if(wasPasswordReset) {
                 userDao.deleteExistingResetPasswordToken(email);

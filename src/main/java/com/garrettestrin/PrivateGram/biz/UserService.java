@@ -76,6 +76,9 @@ public class UserService {
             }
         } else {
             boolean isPasswordVerified = verifyPassword(email, password);
+            if(isPasswordVerified) {
+                setAuthCookie(request, response, user.id);
+            }
             return UserResponse.builder().success(isPasswordVerified).id(user.id).role(user.role).build();
         }
     }

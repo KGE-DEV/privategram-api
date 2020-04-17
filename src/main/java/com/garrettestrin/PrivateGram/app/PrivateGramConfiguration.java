@@ -1,14 +1,13 @@
 package com.garrettestrin.PrivateGram.app;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.garrettestrin.PrivateGram.app.Config.AWSConfig;
 import io.dropwizard.Configuration;
 import io.dropwizard.db.DataSourceFactory;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.validator.constraints.NotEmpty;
-
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 
 @Getter
 @Setter
@@ -31,4 +30,14 @@ public class PrivateGramConfiguration extends Configuration {
     @Valid
     @NotNull
     private DataSourceFactory database;
+
+    @Valid
+    @NotNull
+    private String wpUrl;
+
+    @Valid
+    private AWSConfig awsConfig;
+
+    @Valid
+    private String tinypngKey;
 }

@@ -14,7 +14,7 @@ public interface CommentDao extends SqlObject {
   @SqlUpdate("INSERT INTO "
           + "`comments` (`post_id`, `comment`, `user_id`) "
           +   "VALUES (:post_id, :comment, :user_id);")
-  boolean postComment(@Bind("post_id") int post_id, @Bind("comment") String comment, @Bind("user_id") String user_id);
+  boolean postComment(@Bind("post_id") int post_id, @Bind("comment") String comment, @Bind("user_id") int user_id);
 
   // TODO: JAVADOC
   @SqlQuery("SELECT * "

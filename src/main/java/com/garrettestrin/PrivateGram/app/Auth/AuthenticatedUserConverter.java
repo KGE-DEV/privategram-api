@@ -2,10 +2,9 @@ package com.garrettestrin.PrivateGram.app.Auth;
 
 import com.garrettestrin.PrivateGram.app.PrivateGramConfiguration;
 import io.jsonwebtoken.Claims;
-import lombok.SneakyThrows;
-import org.eclipse.jetty.server.UserIdentity;
-
 import javax.ws.rs.ext.ParamConverter;
+
+import static java.lang.Integer.parseInt;
 
 public class AuthenticatedUserConverter implements ParamConverter<AuthenticatedUser> {
   private static Auth auth;
@@ -24,7 +23,7 @@ public class AuthenticatedUserConverter implements ParamConverter<AuthenticatedU
     if(claims.getId().isEmpty()) {
       throw new UnauthorizedException();
     }
-    return new AuthenticatedUser(claims.getId(), token);
+    return new AuthenticatedUser(parseInt(claims.getId()), token);
   }
 
   @Override

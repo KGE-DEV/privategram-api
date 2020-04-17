@@ -20,7 +20,7 @@ public class CommentService {
   }
 
 
-  public CommentResponse postComment(String comment, int postId, String userId) {
+  public CommentResponse postComment(String comment, int postId, int userId) {
     boolean wasCommentPosted = commentDao.postComment(postId, comment, userId);
     return new CommentResponse(wasCommentPosted, null, null);
   }

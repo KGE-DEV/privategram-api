@@ -24,3 +24,5 @@ app-dev.properties
 \.classpath
 
 .env
+
+tmp/

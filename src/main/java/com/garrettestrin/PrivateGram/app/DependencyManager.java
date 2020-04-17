@@ -8,6 +8,7 @@ import com.garrettestrin.PrivateGram.api.UserResource;
 import com.garrettestrin.PrivateGram.app.Auth.Auth;
 import com.garrettestrin.PrivateGram.app.Auth.AuthenticatedUserConverterProvider;
 import com.garrettestrin.PrivateGram.app.Auth.UnauthorizedExceptionMapper;
+import com.garrettestrin.PrivateGram.app.Config.AWSConfig;
 import com.garrettestrin.PrivateGram.biz.CommentService;
 import com.garrettestrin.PrivateGram.biz.EventService;
 import com.garrettestrin.PrivateGram.biz.PostService;
@@ -49,7 +50,11 @@ class DependencyManager {
         Jdbi db = newDatabase(factory, env, config.getDatabase(), "database");
 
         final Auth auth = new Auth(config);
+        // aws
+        AWSConfig awsConfig;
 
+        // aws
+        awsConfig = config.getAwsConfig();
 
         // UserResource
          final UserDao userDao = db.onDemand(UserDao.class);
@@ -62,7 +67,7 @@ class DependencyManager {
 
         // PostResource
         final PostDao postDao = db.onDemand(PostDao.class);
-        val postService = new PostService(postDao);
+        val postService = new PostService(postDao, awsConfig, config.getTinypngKey());
         postResource = new PostResource(postService);
 
         // EventResource

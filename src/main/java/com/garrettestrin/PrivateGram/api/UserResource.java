@@ -1,21 +1,18 @@
 package com.garrettestrin.PrivateGram.api;
 
 import com.codahale.metrics.annotation.Timed;
-import com.garrettestrin.PrivateGram.api.ApiObjects.*;
+import com.garrettestrin.PrivateGram.api.ApiObjects.Invite;
+import com.garrettestrin.PrivateGram.api.ApiObjects.JWTToken;
+import com.garrettestrin.PrivateGram.api.ApiObjects.UserResponse;
 import com.garrettestrin.PrivateGram.app.Auth.Auth;
 import com.garrettestrin.PrivateGram.app.Auth.AuthenticatedUser;
 import com.garrettestrin.PrivateGram.biz.UserService;
-//import com.garrettestrin.PrivateGram.biz.UserService;
-
-import javax.ws.rs.CookieParam;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
+import java.io.IOException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import java.io.UnsupportedEncodingException;
 
 @Path("/user")
 @Produces(MediaType.APPLICATION_JSON)
@@ -32,69 +29,57 @@ public class UserResource {
 
     @POST
     @Path("/create/token")
-    public JWTToken getToken(@QueryParam("secret") String secret, @QueryParam("user_id") String userId) {
+    public JWTToken getToken(@QueryParam("secret") String secret, @QueryParam("user_id") int userId) {
         if(!secret.equals(auth.SECRET_KEY)) {
             return new JWTToken(null);
         }
         return new JWTToken(auth.createJWT(userId, "garrett.estrin.com", "elsie_gram_auth", -1));
     }
 
-//    // TODO: JAVADOC
-//    // TODO: add error handling
-//    @POST
-//    @Path("/register")
-//    @Timed
-//    public Message registerUser(@QueryParam("email") String email,
-//                                @QueryParam("first_name") String first_name,
-//                                @QueryParam("last_name") String last_name,
-//                                @QueryParam("password") String password) {
-//
-//        return userService.registerUser(email, first_name, last_name, password);
-//    }
-
     @POST
     @Path("/add")
     @Timed
-    public Response addUser(@QueryParam("id") int id,
-                            @QueryParam("email") String email,
+    public UserResponse addUser(@QueryParam("email") String email,
                             @QueryParam("name") String name,
-                            @QueryParam("password") String password,
-                            @QueryParam("secret") String secret) throws UnsupportedEncodingException {
-        if(secret.equals(auth.SECRET_KEY)) {
-            userService.addUser(id, email, name, password);
-            return Response.ok().build();
-        }
-        return Response.serverError().build();
+                            @CookieParam(AUTH_COOKIE) AuthenticatedUser authenticatedUser) {
+            return userService.addUser(email, name);
     }
 
     // TODO: JAVADOC
     // TODO: add error handling
-//    @POST
-//    @Path("/login")
-//    @Timed
-//    public Message registerUser(@QueryParam("email") String email,
-//                                @QueryParam("password") String password) {
-//
-//        return userService.loginUser(email, password);
-//    }
-//
-//    // TODO: JAVADOC
-//    // TODO: add error handling
-//    @POST
-//    @Path("/reset/password")
-//    @Timed
-//    public Message resetPassword(@QueryParam("email") String email) {
-//
-//        return userService.resetPassword(email);
-//    }
-//
-//    @POST
-//    @Path("/verify/token")
-//    @Timed
-//    public Message verifyToken(@QueryParam("token") String token,
-//                               @QueryParam("Auth") String auth) {
-//        return userService.verifyToken(token, auth);
-//    }
+    @POST
+    @Path("/login")
+    @Timed
+    public UserResponse login(@QueryParam("email") String email,
+                                @QueryParam("password") String password,
+                                 @Context HttpServletResponse response,
+                                 @Context HttpServletRequest request) throws IOException {
+
+        return userService.loginUser(email, password, response, request);
+    }
+
+    // TODO: JAVADOC
+    // TODO: add error handling
+    @POST
+    @Path("/password/request/reset")
+    @Timed
+    public UserResponse requestPasswordReset(@QueryParam("email") String email) {
+        return userService.requestPasswordReset(email);
+    }
+
+    @POST
+    @Path("/password/reset")
+    @Timed
+    public UserResponse resetPassword(@QueryParam("email") String email, @QueryParam("password") String password, @QueryParam("token") String token) {
+        return userService.resetPassword(email, password, token);
+    }
+
+    @POST
+    @Path("/request/invite")
+    @Timed
+    public UserResponse requestInvite(Invite invite) {
+        return userService.requestInvite(invite);
+    }
 
     @GET
     @Path("/get/role")

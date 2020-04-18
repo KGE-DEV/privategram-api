@@ -25,3 +25,14 @@ authToken: ${dw.authToken}
 emailUser: ${dw.emailUser}
 emailHost: ${dw.emailHost}
 emailPassword: ${dw.emailPassword}
+
+tinypngKey: ${dw.tinypngKey}
+awsConfig:
+  s3AccessKey: ${dw.awsConfig.s3AccessKey}
+  s3SecretKey: ${dw.awsConfig.s3SecretKey}
+  bucket: ${dw.awsConfig.bucket}
+  bucketUrl: ${dw.awsConfig.bucketUrl}
+  s3Region: ${dw.awsConfig.s3Region}
+
+
+

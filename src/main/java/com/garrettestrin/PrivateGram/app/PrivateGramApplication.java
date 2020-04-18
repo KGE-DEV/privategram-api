@@ -21,9 +21,6 @@ public class PrivateGramApplication extends Application<PrivateGramConfiguration
 
     @Override
     public void initialize(Bootstrap<PrivateGramConfiguration> bootstrap) {
-//        bootstrap.setConfigurationSourceProvider(
-//                new SubstitutingSourceProvider(bootstrap.getConfigurationSourceProvider(),
-//                        new EnvironmentVariableSubstitutor()));
         ConfigurationSourceProvider sourceProvider = new SubstitutingSourceProvider(
                 new ResourceConfigurationSourceProvider(), new EnvironmentVariableSubstitutor(false));
         bootstrap.setConfigurationSourceProvider(sourceProvider);

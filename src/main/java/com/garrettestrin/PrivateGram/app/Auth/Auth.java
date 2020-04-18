@@ -30,15 +30,6 @@ public class Auth {
         this.SECRET_KEY = config.getSecretKey();
     }
 
-    public static String generateSalt () {
-        int length = 512;
-
-        byte[] salt = new byte[length];
-        RAND.nextBytes(salt);
-
-        return Base64.getEncoder().encodeToString(salt);
-    }
-
     public static String hashPassword (String password) {
 
         String salt = config.getSalt();

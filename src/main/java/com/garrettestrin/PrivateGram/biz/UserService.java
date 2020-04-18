@@ -1,6 +1,5 @@
 package com.garrettestrin.PrivateGram.biz;
 
-import com.garrettestrin.PrivateGram.api.ApiObjects.Invite;
 import com.garrettestrin.PrivateGram.api.ApiObjects.JWTToken;
 import com.garrettestrin.PrivateGram.api.ApiObjects.UserResponse;
 import com.garrettestrin.PrivateGram.app.Auth.Auth;
@@ -36,8 +35,9 @@ public class UserService {
     private final String AUTH_TOKEN;
     private final BizUtilities bizUtilities;
     private final String wpUrl;
+    private final String siteDomain;
 
-    private final String AUTH_COOKIE = "elsie_gram_auth";
+    private final String AUTH_COOKIE = "api_auth";
     private int TEN_YEARS_IN_SECONDS = 10 * 365 * 24 * 60 * 60;
 
     public UserService(UserDao userDao, Auth auth, PrivateGramConfiguration config) {
@@ -46,8 +46,9 @@ public class UserService {
         this.auth = auth;
         this.config = config;
         this.AUTH_TOKEN = config.getAuthToken();
-        this.bizUtilities = new BizUtilities(config.getEmailUser(), config.getEmailHost(), config.getEmailPassword());
+        this.bizUtilities = new BizUtilities(config);
         this.wpUrl = config.getWpUrl();
+        this.siteDomain = config.getSiteDomain();
     }
 
     // TODO: JAVADOC
@@ -142,10 +143,10 @@ public class UserService {
         return role;
     }
 
-    public UserResponse requestInvite(Invite invite) {
+    public UserResponse requestInvite(String name, String email) {
         try {
-            userDao.saveInvite(invite.email, invite.name);
-            bizUtilities.sendInviteRequestedEmail();
+            userDao.saveInvite(email, name);
+            bizUtilities.sendInviteRequestedEmail(userDao.getAdminUsers());
             return UserResponse.builder().success(true).build();
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
@@ -154,12 +155,12 @@ public class UserService {
     }
 
     private void setAuthCookie(HttpServletRequest request,  HttpServletResponse response, int userId) throws MalformedURLException {
-        Cookie authCookie = new Cookie(AUTH_COOKIE, new JWTToken(auth.createJWT(userId, "garrett.estrin.com", "elsie_gram_auth", -1)).getToken());
+        Cookie authCookie = new Cookie(AUTH_COOKIE, new JWTToken(auth.createJWT(userId, "garrett.estrin.com", AUTH_COOKIE, -1)).getToken());
         authCookie.setMaxAge(TEN_YEARS_IN_SECONDS);
         authCookie.setPath("/");
         String domain = new URL(request.getRequestURL().toString()).getHost();
         if(!domain.equals("localhost")) {
-            domain = ".elsiegram.com";
+            domain = "." + siteDomain;
             authCookie.isHttpOnly();
             authCookie.setSecure(true);
         }

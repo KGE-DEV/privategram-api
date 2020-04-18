@@ -14,8 +14,6 @@ public class EventResource {
 
   private final EventService eventService;
 
-  private final String AUTH_COOKIE = "elsie_gram_auth";
-
   public EventResource(EventService eventService) {
     this.eventService = eventService;
   }
@@ -23,7 +21,6 @@ public class EventResource {
   @POST
   @Timed
   public void trackEvent(Event event) {
-    String eventName = event.getEvent();
     eventService.saveEvent(event);
   }
 }

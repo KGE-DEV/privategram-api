@@ -40,4 +40,21 @@ public class PrivateGramConfiguration extends Configuration {
 
     @Valid
     private String tinypngKey;
+    @Valid
+    private String siteDomain;
+    @Valid
+    private String siteName;
+
+    @Valid
+    private String inviteRequestSubject;
+    @Valid
+    private String inviteRequestMessage;
+    @Valid
+    private String newUserPasswordResetSubject;
+    @Valid
+    private String newUserPasswordResetMessage;
+    @Valid
+    private String resetPasswordSubject;
+    @Valid
+    private String resetPasswordMessage;
 }

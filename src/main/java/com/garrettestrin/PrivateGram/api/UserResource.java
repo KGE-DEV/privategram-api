@@ -1,10 +1,7 @@
 package com.garrettestrin.PrivateGram.api;
 
 import com.codahale.metrics.annotation.Timed;
-import com.garrettestrin.PrivateGram.api.ApiObjects.InvitesResponse;
-import com.garrettestrin.PrivateGram.api.ApiObjects.JWTToken;
-import com.garrettestrin.PrivateGram.api.ApiObjects.UserResponse;
-import com.garrettestrin.PrivateGram.api.ApiObjects.UsersResponse;
+import com.garrettestrin.PrivateGram.api.ApiObjects.*;
 import com.garrettestrin.PrivateGram.app.Auth.Auth;
 import com.garrettestrin.PrivateGram.app.Auth.AuthenticatedUser;
 import com.garrettestrin.PrivateGram.biz.UserService;
@@ -114,5 +111,16 @@ public class UserResource {
             return UsersResponse.builder().success(false).build();
         }
         return userService.getAllUsers();
+    }
+
+    @POST
+    @Path("/edit")
+    @Timed
+    public UsersResponse editUser(User user, @CookieParam(AUTH_COOKIE) AuthenticatedUser authenticatedUser) {
+        String role = userService.getUserRole(authenticatedUser.getUserId());
+        if(!role.equals("admin")) {
+            return UsersResponse.builder().success(false).build();
+        }
+        return userService.updateUser(user);
     }
 }

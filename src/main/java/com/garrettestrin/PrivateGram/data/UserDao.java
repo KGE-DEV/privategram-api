@@ -83,4 +83,9 @@ public interface UserDao extends SqlObject {
           + "FROM users")
   @RegisterBeanMapper(com.garrettestrin.PrivateGram.api.ApiObjects.User.class)
   List<com.garrettestrin.PrivateGram.api.ApiObjects.User> getAllUsers();
+
+  @SqlUpdate("Update `users` "
+          + "SET name = :name, email = :email, role = :role "
+          + "WHERE id = :id")
+  boolean updateUser(@Bind("id") Long id, @Bind("name") String name, @Bind("email") String email, @Bind("role") String role);
 }

@@ -1,5 +1,6 @@
 package com.garrettestrin.PrivateGram.data;
 
+import com.garrettestrin.PrivateGram.data.DataObjects.Invite;
 import com.garrettestrin.PrivateGram.data.DataObjects.ResetPasswordToken;
 import com.garrettestrin.PrivateGram.data.DataObjects.User;
 import java.util.Date;
@@ -66,4 +67,15 @@ public interface UserDao extends SqlObject {
           +   "WHERE `role` = 'admin'")
   @RegisterBeanMapper(User.class)
   List<User> getAdminUsers();
+
+  @SqlQuery("SELECT id, email, name "
+          +   "FROM invites "
+          +   "WHERE `active` = 1")
+  @RegisterBeanMapper(Invite.class)
+  List<Invite> getInvites();
+
+  @SqlUpdate("Update `invites` "
+            + "SET active = 0 "
+            + "WHERE email = :email")
+  boolean deactivateUserInvite(@Bind("email") String email);
 }

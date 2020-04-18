@@ -1,5 +1,6 @@
 package com.garrettestrin.PrivateGram.biz;
 
+import com.garrettestrin.PrivateGram.api.ApiObjects.InvitesResponse;
 import com.garrettestrin.PrivateGram.api.ApiObjects.JWTToken;
 import com.garrettestrin.PrivateGram.api.ApiObjects.UserResponse;
 import com.garrettestrin.PrivateGram.app.Auth.Auth;
@@ -85,6 +86,7 @@ public class UserService {
     public UserResponse addUser(String email, String name) {
         try {
             userDao.registerUser(email, name, auth.hashPassword(generateRandomPassword()));
+            userDao.deactivateUserInvite(email);
             String token = generateResetToken();
             userDao.saveResetEmailToken(email, token, getTimeInXHours(48));
             bizUtilities.newUserPasswordReset(email, token);
@@ -150,6 +152,10 @@ public class UserService {
             System.out.println(ex.getMessage());
         }
         return UserResponse.builder().success(false).build();
+    }
+
+    public InvitesResponse getInvites() {
+        return InvitesResponse.builder().success(true).invites(userDao.getInvites()).build();
     }
 
     private void setAuthCookie(HttpServletRequest request,  HttpServletResponse response, int userId) throws MalformedURLException {

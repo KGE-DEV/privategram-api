@@ -1,6 +1,7 @@
 package com.garrettestrin.PrivateGram.api;
 
 import com.codahale.metrics.annotation.Timed;
+import com.garrettestrin.PrivateGram.api.ApiObjects.InvitesResponse;
 import com.garrettestrin.PrivateGram.api.ApiObjects.JWTToken;
 import com.garrettestrin.PrivateGram.api.ApiObjects.UserResponse;
 import com.garrettestrin.PrivateGram.app.Auth.Auth;
@@ -86,5 +87,16 @@ public class UserResource {
     public UserResponse getUserRole(@CookieParam(AUTH_COOKIE) AuthenticatedUser authenticatedUser) {
         String role = userService.getUserRole(authenticatedUser.getUserId());
         return UserResponse.builder().success(true).role(role).id(authenticatedUser.getUserId()).build();
+    }
+
+    @GET
+    @Path("/invites")
+    @Timed
+    public InvitesResponse getInvites(@CookieParam(AUTH_COOKIE) AuthenticatedUser authenticatedUser) {
+        String role = userService.getUserRole(authenticatedUser.getUserId());
+        if(!role.equals("admin")) {
+            return InvitesResponse.builder().success(false).build();
+        }
+        return userService.getInvites();
     }
 }

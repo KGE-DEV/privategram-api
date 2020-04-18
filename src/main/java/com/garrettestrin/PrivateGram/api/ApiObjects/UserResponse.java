@@ -13,4 +13,5 @@ public class UserResponse {
   boolean success;
   String role;
   int id;
+  String message;
 }

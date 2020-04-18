@@ -6,6 +6,7 @@ import com.garrettestrin.PrivateGram.api.ApiObjects.UserResponse;
 import com.garrettestrin.PrivateGram.api.ApiObjects.UsersResponse;
 import com.garrettestrin.PrivateGram.app.Auth.Auth;
 import com.garrettestrin.PrivateGram.app.PrivateGramConfiguration;
+import com.garrettestrin.PrivateGram.data.DataObjects.Invite;
 import com.garrettestrin.PrivateGram.data.DataObjects.ResetPasswordToken;
 import com.garrettestrin.PrivateGram.data.DataObjects.User;
 import com.garrettestrin.PrivateGram.data.UserDao;
@@ -145,6 +146,14 @@ public class UserService {
     }
 
     public UserResponse requestInvite(String name, String email) {
+        User user = userDao.getUserByEmail(email);
+        if(user != null) {
+            return UserResponse.builder().success(false).message("You are already a member. If you forgot your password, please use the forgot password link below.").build();
+        }
+        Invite invite = userDao.checkForExistingInvite(email);
+        if(invite != null) {
+            return UserResponse.builder().success(false).message("You have already requested an invite. Please wait to be accepted.").build();
+        }
         try {
             userDao.saveInvite(email, name);
             bizUtilities.sendInviteRequestedEmail(userDao.getAdminUsers());

@@ -32,7 +32,6 @@ public class UserService {
     private final UserDao userDao;
     private final Auth auth;
     private final PrivateGramConfiguration config;
-    private final String AUTH_TOKEN;
     private final BizUtilities bizUtilities;
     private final String wpUrl;
     private final String siteDomain;
@@ -45,7 +44,6 @@ public class UserService {
         this.userDao = userDao;
         this.auth = auth;
         this.config = config;
-        this.AUTH_TOKEN = config.getAuthToken();
         this.bizUtilities = new BizUtilities(config);
         this.wpUrl = config.getWpUrl();
         this.siteDomain = config.getSiteDomain();

@@ -218,4 +218,9 @@ public class UserService {
         userDao.updateUser(user.getId(), user.getName(), user.getEmail(), user.getRole());
         return getAllUsers();
     }
+
+    public InvitesResponse deleteInvite(String email) {
+        boolean wasInviteDeleted = userDao.deactivateUserInvite(email);
+        return  InvitesResponse.builder().success(wasInviteDeleted).build();
+    }
 }

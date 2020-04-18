@@ -123,4 +123,15 @@ public class UserResource {
         }
         return userService.updateUser(user);
     }
+
+    @DELETE
+    @Path("/invite/")
+    @Timed
+    public InvitesResponse deleteInvite(@QueryParam("email") String email, @CookieParam(AUTH_COOKIE) AuthenticatedUser authenticatedUser) {
+        String role = userService.getUserRole(authenticatedUser.getUserId());
+        if(!role.equals("admin")) {
+            return InvitesResponse.builder().success(false).build();
+        }
+        return userService.deleteInvite(email);
+    }
 }

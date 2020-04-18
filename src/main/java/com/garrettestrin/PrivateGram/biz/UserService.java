@@ -3,6 +3,7 @@ package com.garrettestrin.PrivateGram.biz;
 import com.garrettestrin.PrivateGram.api.ApiObjects.InvitesResponse;
 import com.garrettestrin.PrivateGram.api.ApiObjects.JWTToken;
 import com.garrettestrin.PrivateGram.api.ApiObjects.UserResponse;
+import com.garrettestrin.PrivateGram.api.ApiObjects.UsersResponse;
 import com.garrettestrin.PrivateGram.app.Auth.Auth;
 import com.garrettestrin.PrivateGram.app.PrivateGramConfiguration;
 import com.garrettestrin.PrivateGram.data.DataObjects.ResetPasswordToken;
@@ -199,4 +200,8 @@ public class UserService {
         cal.add(Calendar.HOUR_OF_DAY, hours); // adds one hour
         return cal.getTime();
     }
+
+  public UsersResponse getAllUsers() {
+        return UsersResponse.builder().success(true).users(userDao.getAllUsers()).build();
+  }
 }

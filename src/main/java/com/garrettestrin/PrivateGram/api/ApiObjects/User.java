@@ -10,9 +10,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class User {
     @JsonProperty
-    private long id;
-    private String email;
-    private String first_name;
-    private String last_name;
-    private String password;
+    public long id;
+    public String email;
+    public String name;
+    public String role;
+    public boolean wp_pass;
 }

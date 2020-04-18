@@ -4,6 +4,7 @@ import com.codahale.metrics.annotation.Timed;
 import com.garrettestrin.PrivateGram.api.ApiObjects.InvitesResponse;
 import com.garrettestrin.PrivateGram.api.ApiObjects.JWTToken;
 import com.garrettestrin.PrivateGram.api.ApiObjects.UserResponse;
+import com.garrettestrin.PrivateGram.api.ApiObjects.UsersResponse;
 import com.garrettestrin.PrivateGram.app.Auth.Auth;
 import com.garrettestrin.PrivateGram.app.Auth.AuthenticatedUser;
 import com.garrettestrin.PrivateGram.biz.UserService;
@@ -42,7 +43,11 @@ public class UserResource {
     public UserResponse addUser(@QueryParam("email") String email,
                             @QueryParam("name") String name,
                             @CookieParam(AUTH_COOKIE) AuthenticatedUser authenticatedUser) {
-            return userService.addUser(email, name);
+        String role = userService.getUserRole(authenticatedUser.getUserId());
+        if(role != "admin") {
+            return UserResponse.builder().success(false).build();
+        }
+        return userService.addUser(email, name);
     }
 
     // TODO: JAVADOC
@@ -98,5 +103,16 @@ public class UserResource {
             return InvitesResponse.builder().success(false).build();
         }
         return userService.getInvites();
+    }
+
+    @GET
+    @Path("/all")
+    @Timed
+    public UsersResponse getAllUsers(@CookieParam(AUTH_COOKIE) AuthenticatedUser authenticatedUser) {
+        String role = userService.getUserRole(authenticatedUser.getUserId());
+        if(!role.equals("admin")) {
+            return UsersResponse.builder().success(false).build();
+        }
+        return userService.getAllUsers();
     }
 }

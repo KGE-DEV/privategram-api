@@ -4,10 +4,8 @@ import com.codahale.metrics.annotation.Timed;
 import com.garrettestrin.PrivateGram.api.ApiObjects.Comment;
 import com.garrettestrin.PrivateGram.api.ApiObjects.CommentResponse;
 import com.garrettestrin.PrivateGram.app.Auth.AuthenticatedUser;
-import com.garrettestrin.PrivateGram.app.Auth.UnauthorizedException;
 import com.garrettestrin.PrivateGram.biz.CommentService;
 import io.dropwizard.jersey.PATCH;
-
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 
@@ -15,7 +13,7 @@ import javax.ws.rs.core.MediaType;
 @Produces(MediaType.APPLICATION_JSON)
 public class CommentResource {
   private final CommentService commentService;
-  private final String AUTH_COOKIE = "elsie_gram_auth";
+  private final String AUTH_COOKIE = "api_auth";
 
   public CommentResource(CommentService commentService) {
     this.commentService = commentService;

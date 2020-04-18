@@ -3,6 +3,7 @@ package com.garrettestrin.PrivateGram.data;
 import com.garrettestrin.PrivateGram.data.DataObjects.ResetPasswordToken;
 import com.garrettestrin.PrivateGram.data.DataObjects.User;
 import java.util.Date;
+import java.util.List;
 import org.jdbi.v3.sqlobject.SqlObject;
 import org.jdbi.v3.sqlobject.config.RegisterBeanMapper;
 import org.jdbi.v3.sqlobject.customizer.Bind;
@@ -59,4 +60,10 @@ public interface UserDao extends SqlObject {
           + "SET password = :password, wp_pass = 0 "
           + "WHERE email = :email")
   boolean resetPassword(@Bind("email") String email, @Bind("password") String password);
+
+  @SqlQuery("SELECT * "
+          +   "FROM users "
+          +   "WHERE `role` = 'admin'")
+  @RegisterBeanMapper(User.class)
+  List<User> getAdminUsers();
 }

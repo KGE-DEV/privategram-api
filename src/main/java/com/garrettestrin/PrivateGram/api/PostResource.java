@@ -9,7 +9,14 @@ import com.garrettestrin.PrivateGram.biz.PostService;
 import io.dropwizard.jersey.PATCH;
 import java.io.IOException;
 import java.io.InputStream;
-import javax.ws.rs.*;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.CookieParam;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
@@ -21,7 +28,7 @@ import static javax.ws.rs.core.MediaType.MULTIPART_FORM_DATA;
 public class PostResource {
 
   private final PostService postService;
-  private final String AUTH_COOKIE = "elsie_gram_auth";
+  private final String AUTH_COOKIE = "api_auth";
 
   public PostResource(PostService postService) {
     this.postService = postService;

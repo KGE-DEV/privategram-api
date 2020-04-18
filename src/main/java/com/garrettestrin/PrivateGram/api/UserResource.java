@@ -1,7 +1,6 @@
 package com.garrettestrin.PrivateGram.api;
 
 import com.codahale.metrics.annotation.Timed;
-import com.garrettestrin.PrivateGram.api.ApiObjects.Invite;
 import com.garrettestrin.PrivateGram.api.ApiObjects.JWTToken;
 import com.garrettestrin.PrivateGram.api.ApiObjects.UserResponse;
 import com.garrettestrin.PrivateGram.app.Auth.Auth;
@@ -20,7 +19,7 @@ public class UserResource {
     private UserService userService;
     private Auth auth;
 
-    private final String AUTH_COOKIE = "elsie_gram_auth";
+    private final String AUTH_COOKIE = "api_auth";
 
     public UserResource(Auth auth, UserService userService) {
         this.userService = userService;
@@ -33,7 +32,7 @@ public class UserResource {
         if(!secret.equals(auth.SECRET_KEY)) {
             return new JWTToken(null);
         }
-        return new JWTToken(auth.createJWT(userId, "garrett.estrin.com", "elsie_gram_auth", -1));
+        return new JWTToken(auth.createJWT(userId, "garrett.estrin.com", AUTH_COOKIE, -1));
     }
 
     @POST
@@ -77,8 +76,8 @@ public class UserResource {
     @POST
     @Path("/request/invite")
     @Timed
-    public UserResponse requestInvite(Invite invite) {
-        return userService.requestInvite(invite);
+    public UserResponse requestInvite(@QueryParam("email") String email, @QueryParam("name") String name) {
+        return userService.requestInvite(name, email);
     }
 
     @GET

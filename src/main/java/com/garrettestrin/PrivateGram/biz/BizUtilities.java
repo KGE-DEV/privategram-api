@@ -1,5 +1,8 @@
 package com.garrettestrin.PrivateGram.biz;
 
+import com.garrettestrin.PrivateGram.app.PrivateGramConfiguration;
+import com.garrettestrin.PrivateGram.data.DataObjects.User;
+import java.util.List;
 import java.util.Properties;
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
@@ -9,11 +12,27 @@ public class BizUtilities {
     private final String user;
     private final String host;
     private final String password;
+    private final String siteName;
+    private final String siteUrl;
+    private final String inviteRequestSubject;
+    private final String inviteRequestMessage;
+    private final String newUserPasswordResetSubject;
+    private final String newUserPasswordResetMessage;
+    private final String resetPasswordSubject;
+    private final String resetPasswordMessage;
 
-    public BizUtilities(String user, String host, String emailPassword) {
-        this.user = user;
-        this.host = host;
-        this.password = emailPassword;
+    public BizUtilities(PrivateGramConfiguration config) {
+        this.user = config.getEmailUser();
+        this.host = config.getEmailHost();
+        this.password = config.getEmailPassword();
+        this.siteName = config.getSiteName();
+        this.siteUrl = config.getSiteDomain();
+        this.inviteRequestSubject = config.getInviteRequestSubject();
+        this.inviteRequestMessage = config.getInviteRequestMessage();
+        this.newUserPasswordResetSubject = config.getNewUserPasswordResetSubject();
+        this.newUserPasswordResetMessage = config.getNewUserPasswordResetMessage();
+        this.resetPasswordSubject = config.getResetPasswordSubject();
+        this.resetPasswordMessage = config.getResetPasswordMessage();
     }
 
     public boolean sendEmail(String recipient, String subject, String messageBody) {
@@ -46,25 +65,26 @@ public class BizUtilities {
         }
     }
 
-    public boolean sendInviteRequestedEmail() {
-        // TODO: get admin users from db
-        String to = "garrett.estrin@gmail.com";
-        String subject = "New Elsiegram Invite Request";
-        String message = "A new invite has been requested for ElsieGram.com. Approve users at https://elsiegram.com/admin/invites.";
-        return sendEmail(to, subject, message);
+    public boolean sendInviteRequestedEmail(List<User> admins) {
+        String subject = String.format(inviteRequestSubject, siteName) ;
+        String message = String.format(inviteRequestMessage, siteName, siteUrl);
+        for (int i = 0; i < admins.size(); i++) {
+            sendEmail(admins.get(i).email, subject, message);
+        }
+        return true;
     }
 
     public boolean newUserPasswordReset(String userEmail, String token) {
         String to = userEmail;
-        String subject = "Elsiegram Registration";
-        String message = "You have been accepted to Elsiegram.com. Please follow the link to set your password: https://elsiegram.com/reset-password?token=" + token;
+        String subject = String.format(newUserPasswordResetSubject, siteName);
+        String message = String.format(newUserPasswordResetMessage + token, siteName, siteUrl);
         return sendEmail(to, subject, message);
     }
 
     public boolean sendResetPasswordEmail(String userEmail, String token) {
         String to = userEmail;
-        String subject = "Elsiegram Password Reset";
-        String message = "You have requested a new password for Elisegram.com. Please follow this link to reset your password: https://elsiegram.com/reset-password?token=" + token;
+        String subject = String.format(resetPasswordSubject, siteName);
+        String message = String.format(resetPasswordMessage + token, siteName, siteUrl);
         return sendEmail(to, subject, message);
     }
 }

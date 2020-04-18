@@ -74,6 +74,12 @@ public interface UserDao extends SqlObject {
   @RegisterBeanMapper(Invite.class)
   List<Invite> getInvites();
 
+  @SqlQuery("Select * "
+          + "FROM invites "
+          + "WHERE email = :email")
+  @RegisterBeanMapper(Invite.class)
+  Invite checkForExistingInvite(@Bind("email") String email);
+
   @SqlUpdate("Update `invites` "
             + "SET active = 0 "
             + "WHERE email = :email")

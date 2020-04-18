@@ -41,7 +41,7 @@ public class UserResource {
                             @QueryParam("name") String name,
                             @CookieParam(AUTH_COOKIE) AuthenticatedUser authenticatedUser) {
         String role = userService.getUserRole(authenticatedUser.getUserId());
-        if(role != "admin") {
+        if(!role.equals("admin")) {
             return UserResponse.builder().success(false).build();
         }
         return userService.addUser(email, name);
@@ -125,7 +125,7 @@ public class UserResource {
     }
 
     @DELETE
-    @Path("/invite/")
+    @Path("/invite")
     @Timed
     public InvitesResponse deleteInvite(@QueryParam("email") String email, @CookieParam(AUTH_COOKIE) AuthenticatedUser authenticatedUser) {
         String role = userService.getUserRole(authenticatedUser.getUserId());
@@ -133,5 +133,16 @@ public class UserResource {
             return InvitesResponse.builder().success(false).build();
         }
         return userService.deleteInvite(email);
+    }
+
+    @DELETE
+    @Path("/delete")
+    @Timed
+    public UserResponse deleteUser(@QueryParam("id") int id, @CookieParam(AUTH_COOKIE) AuthenticatedUser authenticatedUser) {
+        String role = userService.getUserRole(authenticatedUser.getUserId());
+        if(!role.equals("admin")) {
+            return UserResponse.builder().success(false).build();
+        }
+        return userService.deleteUser(id);
     }
 }

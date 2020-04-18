@@ -86,7 +86,8 @@ public interface UserDao extends SqlObject {
   boolean deactivateUserInvite(@Bind("email") String email);
 
   @SqlQuery("SELECT id, name, email, role, wp_pass "
-          + "FROM users")
+          + "FROM users "
+          + "WHERE active = 1")
   @RegisterBeanMapper(com.garrettestrin.PrivateGram.api.ApiObjects.User.class)
   List<com.garrettestrin.PrivateGram.api.ApiObjects.User> getAllUsers();
 
@@ -94,4 +95,9 @@ public interface UserDao extends SqlObject {
           + "SET name = :name, email = :email, role = :role "
           + "WHERE id = :id")
   boolean updateUser(@Bind("id") Long id, @Bind("name") String name, @Bind("email") String email, @Bind("role") String role);
+
+  @SqlUpdate("Update `users` "
+            + "SET active = 0 "
+            + "WHERE id = :id")
+  boolean deactivateUser(@Bind("id") int id);
 }

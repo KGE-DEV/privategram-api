@@ -204,4 +204,9 @@ public class UserService {
   public UsersResponse getAllUsers() {
         return UsersResponse.builder().success(true).users(userDao.getAllUsers()).build();
   }
+
+    public UsersResponse updateUser(com.garrettestrin.PrivateGram.api.ApiObjects.User user) {
+        userDao.updateUser(user.getId(), user.getName(), user.getEmail(), user.getRole());
+        return getAllUsers();
+    }
 }

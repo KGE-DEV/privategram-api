@@ -223,4 +223,9 @@ public class UserService {
         boolean wasInviteDeleted = userDao.deactivateUserInvite(email);
         return  InvitesResponse.builder().success(wasInviteDeleted).build();
     }
+
+    public UserResponse deleteUser(int id) {
+        boolean wasUserDeativated = userDao.deactivateUser(id);
+        return UserResponse.builder().success(wasUserDeativated).build();
+    }
 }

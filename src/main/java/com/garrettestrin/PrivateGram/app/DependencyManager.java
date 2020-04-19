@@ -73,7 +73,7 @@ class DependencyManager {
         // EventResource
         final EventDao eventDao = db.onDemand(EventDao.class);
         val eventService = new EventService(eventDao);
-        eventResouce = new EventResource(eventService);
+        eventResouce = new EventResource(eventService, userService);
 
         authenticatedUserConverterProvider = new AuthenticatedUserConverterProvider(config);
         unauthorizedExceptionMapper = new UnauthorizedExceptionMapper();

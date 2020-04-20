@@ -26,7 +26,7 @@ public interface CommentDao extends SqlObject {
 //  TODO: JAVADOC
 @SqlQuery("SELECT c.id, c.post_id, c.comment, u.name FROM comments as c "
         + "INNER JOIN users as u on c.user_id = u.id "
-        + "WHERE post_id = :post_id and active = 1 ")
+        + "WHERE post_id = :post_id and c.active = 1 ")
   @RegisterBeanMapper(Comment.class)
   List<Comment> getAllComments(@Bind("post_id") int post_id);
 

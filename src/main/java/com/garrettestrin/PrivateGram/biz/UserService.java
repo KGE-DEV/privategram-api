@@ -125,13 +125,14 @@ public class UserService {
         return UserResponse.builder().success(emailSent).build();
     }
 
-    public UserResponse resetPassword(String email, String password, String token) {
+    public UserResponse resetPassword(String email, String password, String token, HttpServletResponse response, HttpServletRequest request) throws MalformedURLException {
         boolean wasPasswordReset = false;
         ResetPasswordToken resetPasswordToken = userDao.checkForExistingResetToken(email);
         if(resetPasswordToken != null && resetPasswordToken.token.equals(token)) {
             wasPasswordReset = userDao.resetPassword(email, auth.hashPassword(password));
             if(wasPasswordReset) {
                 userDao.deleteExistingResetPasswordToken(email);
+                setAuthCookie(request, response, userDao.getUserByEmail(email).id);
             }
         }
         return UserResponse.builder().success(wasPasswordReset).build();

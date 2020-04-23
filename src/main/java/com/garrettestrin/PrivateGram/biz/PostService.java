@@ -18,11 +18,13 @@ import com.garrettestrin.PrivateGram.data.PostDao;
 import com.tinify.Options;
 import com.tinify.Source;
 import com.tinify.Tinify;
+import com.vdurmont.emoji.EmojiParser;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 import javax.imageio.ImageIO;
 
@@ -50,7 +52,7 @@ public class PostService {
 
     String filePath = writeStreamToFile(inputStream, name);
     String urlString = uploadToS3(resizeAndCompressImage(name), type, name);
-    boolean wasPostAdded = postDao.addPost(caption, awsConfig.getBucketUrl() + "/" + urlString);
+    boolean wasPostAdded = postDao.addPost(EmojiParser.parseToAliases(caption), awsConfig.getBucketUrl() + "/" + urlString);
     return new PostResponse(wasPostAdded, "Posted", null);
   }
 
@@ -64,7 +66,7 @@ public class PostService {
     if(lower_limit > 0) {
       lower_limit = (lower_limit - 1) * 10;
     }
-    return new PostResponse(true, null, postDao.getPaginatedPosts(lower_limit));
+    return new PostResponse(true, null, parsePostsForEmojis(postDao.getPaginatedPosts(lower_limit)));
   }
 
   public PostResponse editPost(int postId, String postContent) {
@@ -139,4 +141,13 @@ public class PostService {
     return pathToFile;
   }
 
+  private List<Post> parsePostsForEmojis(List<Post> posts) {
+    List<Post> parsedPosts = new ArrayList<>();
+    for(int i = 0; i < posts.size();i++) {
+      Post post = posts.get(i);
+      Post tempPost = Post.builder().post_content(EmojiParser.parseToUnicode(post.getPost_content())).id(post.getId()).post_image_url(post.getPost_image_url()).date_time_added(post.getDate_time_added()).build();
+      parsedPosts.add(i, tempPost);
+    }
+    return parsedPosts;
+  }
 }

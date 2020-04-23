@@ -3,7 +3,8 @@ package com.garrettestrin.PrivateGram.biz;
 import com.garrettestrin.PrivateGram.api.ApiObjects.CommentResponse;
 import com.garrettestrin.PrivateGram.data.CommentDao;
 import com.garrettestrin.PrivateGram.data.DataObjects.Comment;
-
+import com.vdurmont.emoji.EmojiParser;
+import java.util.ArrayList;
 import java.util.List;
 
 public class CommentService {
@@ -21,18 +22,29 @@ public class CommentService {
 
 
   public CommentResponse postComment(String comment, int postId, int userId) {
-    boolean wasCommentPosted = commentDao.postComment(postId, comment, userId);
+    String encodedComment  = EmojiParser.parseToAliases(comment);
+    boolean wasCommentPosted = commentDao.postComment(postId, encodedComment, userId);
     return new CommentResponse(wasCommentPosted, null, null);
   }
 
-  public CommentResponse getAllComments(int post_id) {
-    List<Comment> comments = commentDao.getAllComments(post_id);
+  public CommentResponse getCommentsPreview(int post_id) {
+    List<Comment> comments = parseCommentsForEmojis(commentDao.getCommentsPreview(post_id));
     return new CommentResponse(true, null, comments);
   }
 
-  public CommentResponse getCommentsPreview(int post_id) {
-    List<Comment> comments = commentDao.getCommentsPreview(post_id);
+  public CommentResponse getAllComments(int post_id) {
+    List<Comment> comments = parseCommentsForEmojis(commentDao.getAllComments(post_id));
     return new CommentResponse(true, null, comments);
+  }
+
+  private List<Comment> parseCommentsForEmojis(List<Comment> comments) {
+    List<Comment> parsedComments = new ArrayList<>();
+    for(int i = 0; i < comments.size();i++) {
+      Comment comment = comments.get(i);
+      Comment tempComment = Comment.builder().comment(EmojiParser.parseToUnicode(comment.getComment())).id(comment.getId()).name(comment.getName()).post_id(comment.post_id).build();
+      parsedComments.add(i, tempComment);
+    }
+    return parsedComments;
   }
 
   public CommentResponse editComment(int comment_id, String comment) {

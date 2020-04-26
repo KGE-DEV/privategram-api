@@ -29,8 +29,8 @@ public class BizUtilities {
         this.siteUrl = config.getSiteDomain();
         this.inviteRequestSubject = config.getInviteRequestSubject();
         this.inviteRequestMessage = config.getInviteRequestMessage();
-        this.newUserPasswordResetSubject = config.getNewUserPasswordResetSubject();
-        this.newUserPasswordResetMessage = config.getNewUserPasswordResetMessage();
+        this.newUserPasswordResetSubject = config.getNewUserPasswordSetSubject();
+        this.newUserPasswordResetMessage = config.getNewUserPasswordSetMessage();
         this.resetPasswordSubject = config.getResetPasswordSubject();
         this.resetPasswordMessage = config.getResetPasswordMessage();
     }
@@ -74,17 +74,17 @@ public class BizUtilities {
         return true;
     }
 
-    public boolean newUserPasswordReset(String userEmail, String token) {
+    public boolean newUserPasswordSet(String userEmail, String token) {
         String to = userEmail;
         String subject = String.format(newUserPasswordResetSubject, siteName);
-        String message = String.format(newUserPasswordResetMessage + token, siteName, siteUrl);
+        String message = String.format(newUserPasswordResetMessage + token + "&set=true&email=" + userEmail, siteName, siteUrl);
         return sendEmail(to, subject, message);
     }
 
     public boolean sendResetPasswordEmail(String userEmail, String token) {
         String to = userEmail;
         String subject = String.format(resetPasswordSubject, siteName);
-        String message = String.format(resetPasswordMessage + token, siteName, siteUrl);
+        String message = String.format(resetPasswordMessage + token + "&email=" + userEmail, siteName, siteUrl);
         return sendEmail(to, subject, message);
     }
 }

@@ -50,9 +50,9 @@ public class PrivateGramConfiguration extends Configuration {
     @Valid
     private String inviteRequestMessage;
     @Valid
-    private String newUserPasswordResetSubject;
+    private String newUserPasswordSetSubject;
     @Valid
-    private String newUserPasswordResetMessage;
+    private String newUserPasswordSetMessage;
     @Valid
     private String resetPasswordSubject;
     @Valid

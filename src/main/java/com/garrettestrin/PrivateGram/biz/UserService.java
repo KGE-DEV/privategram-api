@@ -91,7 +91,7 @@ public class UserService {
             userDao.deactivateUserInvite(email);
             String token = generateResetToken();
             userDao.saveResetEmailToken(email, token, getTimeInXHours(48));
-            bizUtilities.newUserPasswordReset(email, token);
+            bizUtilities.newUserPasswordSet(email, token);
             return UserResponse.builder().success(true).build();
         } catch (Exception e) {
             return UserResponse.builder().success(false).build();

@@ -14,4 +14,5 @@ public class Event {
   public String event;
   public String page;
   public String meta;
+  public String date_time;
 }

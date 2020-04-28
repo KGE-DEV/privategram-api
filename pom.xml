@@ -140,5 +140,10 @@
             <artifactId>tinify</artifactId>
             <version>RELEASE</version>
         </dependency>
+        <dependency>
+            <groupId>com.vdurmont</groupId>
+            <artifactId>emoji-java</artifactId>
+            <version>5.1.1</version>
+        </dependency>
     </dependencies>
 </project>

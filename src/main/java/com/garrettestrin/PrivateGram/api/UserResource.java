@@ -6,6 +6,7 @@ import com.garrettestrin.PrivateGram.app.Auth.Auth;
 import com.garrettestrin.PrivateGram.app.Auth.AuthenticatedUser;
 import com.garrettestrin.PrivateGram.biz.UserService;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.*;
@@ -72,8 +73,12 @@ public class UserResource {
     @POST
     @Path("/password/reset")
     @Timed
-    public UserResponse resetPassword(@QueryParam("email") String email, @QueryParam("password") String password, @QueryParam("token") String token) {
-        return userService.resetPassword(email, password, token);
+    public UserResponse resetPassword(@QueryParam("email") String email,
+                                      @QueryParam("password") String password,
+                                      @QueryParam("token") String token,
+                                      @Context HttpServletResponse response,
+                                      @Context HttpServletRequest request) throws MalformedURLException {
+        return userService.resetPassword(email, password, token, response, request);
     }
 
     @POST

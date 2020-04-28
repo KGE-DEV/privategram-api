@@ -23,4 +23,8 @@ public class EventService {
   public EventResponse getEventsByUser(int userId) {
     return EventResponse.builder().success(true).events(eventDao.getEventsByUser(userId)).build();
   }
+
+  public EventResponse getLatestEvents() {
+    return EventResponse.builder().success(true).events(eventDao.getLatestEvents()).build();
+  }
 }

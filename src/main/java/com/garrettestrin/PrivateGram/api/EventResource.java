@@ -49,4 +49,15 @@ public class EventResource {
     }
     return eventService.getEventsByUser(userId);
   }
+
+  @GET
+  @Path("/latest")
+  @Timed
+  public EventResponse getLatestEvents(@CookieParam(AUTH_COOKIE) AuthenticatedUser authenticatedUser) {
+    String role = userService.getUserRole(authenticatedUser.getUserId());
+    if(!role.equals("admin")) {
+      return EventResponse.builder().success(false).build();
+    }
+    return eventService.getLatestEvents();
+  }
 }

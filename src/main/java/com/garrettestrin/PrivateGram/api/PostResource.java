@@ -42,7 +42,6 @@ public class PostResource {
    */
   @POST
   @Path("/add")
-  @Timed
   @Consumes(MULTIPART_FORM_DATA)
   public PostResponse addPost(
           @FormDataParam("caption") String caption,

@@ -70,7 +70,7 @@ public class PostService {
   }
 
   public PostResponse editPost(int postId, String postContent) {
-    boolean wasPostEdited = postDao.editPost(postId, postContent);
+    boolean wasPostEdited = postDao.editPost(postId, EmojiParser.parseToAliases(postContent));
     String postEditedMessage = wasPostEdited ? EDITED_POST_SUCCESS : EDITED_POST_FAIL;
     List<Post> updatedPost = postDao.getPost(postId);
     return new PostResponse(wasPostEdited, postEditedMessage, updatedPost);

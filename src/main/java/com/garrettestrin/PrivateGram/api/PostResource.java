@@ -6,7 +6,6 @@ import com.garrettestrin.PrivateGram.api.ApiObjects.PostCountResponse;
 import com.garrettestrin.PrivateGram.api.ApiObjects.PostResponse;
 import com.garrettestrin.PrivateGram.app.Auth.AuthenticatedUser;
 import com.garrettestrin.PrivateGram.biz.PostService;
-import io.dropwizard.jersey.PATCH;
 import java.io.IOException;
 import java.io.InputStream;
 import javax.ws.rs.Consumes;
@@ -14,6 +13,7 @@ import javax.ws.rs.CookieParam;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -76,7 +76,7 @@ public class PostResource {
     return postService.getPaginatedPosts(page);
   }
 
-  @PATCH
+  @PUT
   @Path("/edit")
   @Timed
   public PostResponse editPost(Post post, @CookieParam(AUTH_COOKIE) AuthenticatedUser authenticatedUser) {

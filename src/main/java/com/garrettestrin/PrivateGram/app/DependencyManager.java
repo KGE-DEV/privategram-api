@@ -67,7 +67,7 @@ class DependencyManager {
 
         // PostResource
         final PostDao postDao = db.onDemand(PostDao.class);
-        val postService = new PostService(postDao, awsConfig, config.getTinypngKey());
+        val postService = new PostService(postDao, awsConfig, config.getTinypngKey(), config, userDao);
         postResource = new PostResource(postService);
 
         // EventResource

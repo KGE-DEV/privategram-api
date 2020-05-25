@@ -13,8 +13,10 @@ import com.amazonaws.util.IOUtils;
 import com.garrettestrin.PrivateGram.api.ApiObjects.PostCountResponse;
 import com.garrettestrin.PrivateGram.api.ApiObjects.PostResponse;
 import com.garrettestrin.PrivateGram.app.Config.AWSConfig;
+import com.garrettestrin.PrivateGram.app.PrivateGramConfiguration;
 import com.garrettestrin.PrivateGram.data.DataObjects.Post;
 import com.garrettestrin.PrivateGram.data.PostDao;
+import com.garrettestrin.PrivateGram.data.UserDao;
 import com.tinify.Options;
 import com.tinify.Source;
 import com.tinify.Tinify;
@@ -26,11 +28,16 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import javax.imageio.ImageIO;
+import lombok.extern.jbosslog.JBossLog;
 
+@JBossLog
 public class PostService {
 
   private final PostDao postDao;
+  private final UserDao userDao;
   private final AWSConfig awsConfig;
   private final Regions regions;
 
@@ -38,22 +45,37 @@ public class PostService {
   private final String DELETED_POST_FAIL = "post was not deleted";
   private final String EDITED_POST_SUCCESS = "post was edited";
   private final String EDITED_POST_FAIL = "post was not edited";
+  private final int MAX_THREADS = 256;
   private final String tinifyKey;
+  private final Executor executor = Executors.newFixedThreadPool(MAX_THREADS);
+  private final BizUtilities bizUtilities;
 
-  public PostService(PostDao postDao, AWSConfig awsConfig, String tinifyKey) {
+  public PostService(PostDao postDao, AWSConfig awsConfig, String tinifyKey, PrivateGramConfiguration config, UserDao userDao) {
 
     this.postDao = postDao;
+    this.userDao = userDao;
     this.awsConfig = awsConfig;
     this.regions = Regions.fromName(awsConfig.getS3Region());
     this.tinifyKey = tinifyKey;
+    this.bizUtilities = new BizUtilities(config);
   }
 
   public PostResponse addPost(String caption, InputStream inputStream, String name, String type) throws IOException {
 
-    String filePath = writeStreamToFile(inputStream, name);
-    String urlString = uploadToS3(resizeAndCompressImage(name), type, name);
-    boolean wasPostAdded = postDao.addPost(EmojiParser.parseToAliases(caption), awsConfig.getBucketUrl() + "/" + urlString);
-    return new PostResponse(wasPostAdded, "Posted", null);
+    writeStreamToFile(inputStream, name);
+    executor.execute(() -> {
+      String urlString = null;
+      try {
+        urlString = uploadToS3(resizeAndCompressImage(name), type, name);
+      } catch (IOException e) {
+        e.printStackTrace();
+       bizUtilities.sendPostErrorEmail(userDao.getAdminUsers());
+       return;
+      }
+      postDao.addPost(EmojiParser.parseToAliases(caption), awsConfig.getBucketUrl() + "/" + urlString);
+      log.info("Post was successfully processed");
+    });
+    return PostResponse.builder().success(true).message("Your post is being processed").build();
   }
 
   public PostResponse getAllPosts() {

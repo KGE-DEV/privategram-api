@@ -7,7 +7,9 @@ import java.util.Properties;
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+import lombok.extern.jbosslog.JBossLog;
 
+@JBossLog
 public class BizUtilities {
     private final String user;
     private final String host;
@@ -56,7 +58,7 @@ public class BizUtilities {
 
             // Send message
             Transport.send(message);
-            System.out.println("message sent successfully....");
+            log.info("message sent successfully.");
             return true;
 
         } catch (MessagingException ex) {
@@ -86,5 +88,14 @@ public class BizUtilities {
         String subject = String.format(resetPasswordSubject, siteName);
         String message = String.format(resetPasswordMessage + token + "&email=" + userEmail, siteName, siteUrl);
         return sendEmail(to, subject, message);
+    }
+
+    public boolean sendPostErrorEmail(List<User> admins) {
+        String subject = String.format("Failed %s Post", siteName) ;
+        String message = String.format("Your post on %s failed to save. Please try again.", siteName);
+        for (int i = 0; i < admins.size(); i++) {
+            sendEmail(admins.get(i).email, subject, message);
+        }
+        return true;
     }
 }

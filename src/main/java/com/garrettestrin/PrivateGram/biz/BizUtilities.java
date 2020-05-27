@@ -90,9 +90,9 @@ public class BizUtilities {
         return sendEmail(to, subject, message);
     }
 
-    public boolean sendPostErrorEmail(List<User> admins) {
+    public boolean sendPostErrorEmail(List<User> admins, String caption) {
         String subject = String.format("Failed %s Post", siteName) ;
-        String message = String.format("Your post on %s failed to save. Please try again.", siteName);
+        String message = String.format("Your post on %s failed to save. Please try again. Caption: %s", siteName, caption);
         for (int i = 0; i < admins.size(); i++) {
             sendEmail(admins.get(i).email, subject, message);
         }

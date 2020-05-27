@@ -64,12 +64,14 @@ public class PostService {
 
     writeStreamToFile(inputStream, name);
     executor.execute(() -> {
-      String urlString = null;
+      String urlString;
       try {
         urlString = uploadToS3(resizeAndCompressImage(name), type, name);
       } catch (IOException e) {
         e.printStackTrace();
-       bizUtilities.sendPostErrorEmail(userDao.getAdminUsers());
+        // if post failed
+        // send an email to admins
+       bizUtilities.sendPostErrorEmail(userDao.getAdminUsers(), caption);
        return;
       }
       postDao.addPost(EmojiParser.parseToAliases(caption), awsConfig.getBucketUrl() + "/" + urlString);

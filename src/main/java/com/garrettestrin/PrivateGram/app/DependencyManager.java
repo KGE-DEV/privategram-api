@@ -7,6 +7,7 @@ import com.garrettestrin.PrivateGram.api.PostResource;
 import com.garrettestrin.PrivateGram.api.UserResource;
 import com.garrettestrin.PrivateGram.app.Auth.Auth;
 import com.garrettestrin.PrivateGram.app.Auth.AuthenticatedUserConverterProvider;
+import com.garrettestrin.PrivateGram.app.Auth.ServerErrorExceptionMapper;
 import com.garrettestrin.PrivateGram.app.Auth.UnauthorizedExceptionMapper;
 import com.garrettestrin.PrivateGram.app.Config.AWSConfig;
 import com.garrettestrin.PrivateGram.biz.CommentService;
@@ -39,9 +40,11 @@ class DependencyManager {
     public final UserResource userResource;
     public final CommentResource commentResource;
     public final PostResource postResource;
-    public final EventResource eventResouce;
+    public final EventResource eventResource;
     public final AuthenticatedUserConverterProvider authenticatedUserConverterProvider;
     public final UnauthorizedExceptionMapper unauthorizedExceptionMapper;
+    public final ServerErrorExceptionMapper serverErrorExceptionMapper;
+
 
     DependencyManager(PrivateGramConfiguration config, Environment env) {
         log.info("Initializing database pool...");
@@ -73,10 +76,11 @@ class DependencyManager {
         // EventResource
         final EventDao eventDao = db.onDemand(EventDao.class);
         val eventService = new EventService(eventDao);
-        eventResouce = new EventResource(eventService, userService);
+        eventResource = new EventResource(eventService, userService);
 
         authenticatedUserConverterProvider = new AuthenticatedUserConverterProvider(config);
         unauthorizedExceptionMapper = new UnauthorizedExceptionMapper();
+        serverErrorExceptionMapper = new ServerErrorExceptionMapper(config);
 
         // HealthChecks
         HealthCheck dbHealthCheck = new DBHealthCheck("users");

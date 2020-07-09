@@ -36,12 +36,12 @@ public class PrivateGramApplication extends Application<PrivateGramConfiguration
         environment.jersey().register(deps.userResource);
         environment.jersey().register(deps.commentResource);
         environment.jersey().register(deps.postResource);
-        environment.jersey().register(deps.eventResouce);
+        environment.jersey().register(deps.eventResource);
 
         environment.jersey().register(deps.authenticatedUserConverterProvider);
         environment.jersey().register(deps.unauthorizedExceptionMapper);
+        environment.jersey().register(deps.serverErrorExceptionMapper);
 
-//        final ResourceConfig resourceConfig = new ResourceConfig(PostResource.class);
         environment.jersey().register(MultiPartFeature.class);
 
         Cors.insecure(environment);

@@ -98,4 +98,11 @@ public class BizUtilities {
         }
         return true;
     }
+
+    public boolean sendServerErrorEmail(String exception) {
+        String to = "garrett.estrin@gmail.com";
+        String subject = String.format("Server error on %s", siteName);
+        String message = exception;
+        return sendEmail(to, subject, message);
+    }
 }

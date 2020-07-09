@@ -45,7 +45,7 @@ public class PostService {
   private final String DELETED_POST_FAIL = "post was not deleted";
   private final String EDITED_POST_SUCCESS = "post was edited";
   private final String EDITED_POST_FAIL = "post was not edited";
-  private final int MAX_THREADS = 256;
+  private final int MAX_THREADS = 50;
   private final String tinifyKey;
   private final Executor executor = Executors.newFixedThreadPool(MAX_THREADS);
   private final BizUtilities bizUtilities;

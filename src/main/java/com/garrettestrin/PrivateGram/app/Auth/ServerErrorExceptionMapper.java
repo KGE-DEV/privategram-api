@@ -14,7 +14,7 @@ import javax.ws.rs.ext.Provider;
 @Provider
 public class ServerErrorExceptionMapper implements ExceptionMapper<Exception> {
   private final PrivateGramConfiguration config;
-  private final int MAX_THREADS = 256;
+  private final int MAX_THREADS = 50;
   private final Executor executor = Executors.newFixedThreadPool(MAX_THREADS);
 
   public ServerErrorExceptionMapper(PrivateGramConfiguration config) {

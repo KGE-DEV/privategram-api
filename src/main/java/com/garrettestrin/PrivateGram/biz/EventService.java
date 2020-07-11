@@ -14,7 +14,10 @@ public class EventService {
   }
 
   public void saveEvent(Event event) {
-    String meta = EmojiParser.parseToAliases(event.getMeta());
+    String meta = new String();
+    if (null != event.getMeta()) {
+      meta = EmojiParser.parseToAliases(event.getMeta());
+    }
     eventDao.saveEvent(event.getUserId(), event.getEvent(), event.getPage(), meta);
   }
 

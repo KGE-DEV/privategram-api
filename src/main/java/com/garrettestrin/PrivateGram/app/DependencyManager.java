@@ -7,7 +7,6 @@ import com.garrettestrin.PrivateGram.api.PostResource;
 import com.garrettestrin.PrivateGram.api.UserResource;
 import com.garrettestrin.PrivateGram.app.Auth.Auth;
 import com.garrettestrin.PrivateGram.app.Auth.AuthenticatedUserConverterProvider;
-import com.garrettestrin.PrivateGram.app.Auth.ServerErrorExceptionMapper;
 import com.garrettestrin.PrivateGram.app.Auth.UnauthorizedExceptionMapper;
 import com.garrettestrin.PrivateGram.app.Config.AWSConfig;
 import com.garrettestrin.PrivateGram.biz.CommentService;

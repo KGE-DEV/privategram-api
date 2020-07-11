@@ -1,6 +1,5 @@
-package com.garrettestrin.PrivateGram.app.Auth;
+package com.garrettestrin.PrivateGram.app;
 
-import com.garrettestrin.PrivateGram.app.PrivateGramConfiguration;
 import com.garrettestrin.PrivateGram.biz.BizUtilities;
 import java.io.PrintWriter;
 import java.io.StringWriter;

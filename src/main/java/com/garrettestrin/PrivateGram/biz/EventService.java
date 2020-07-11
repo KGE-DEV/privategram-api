@@ -3,6 +3,7 @@ package com.garrettestrin.PrivateGram.biz;
 import com.garrettestrin.PrivateGram.api.ApiObjects.Event;
 import com.garrettestrin.PrivateGram.api.ApiObjects.EventResponse;
 import com.garrettestrin.PrivateGram.data.EventDao;
+import com.vdurmont.emoji.EmojiParser;
 
 public class EventService {
 
@@ -13,7 +14,8 @@ public class EventService {
   }
 
   public void saveEvent(Event event) {
-    eventDao.saveEvent(event.getUserId(), event.getEvent(), event.getPage(), event.getMeta());
+    String meta = EmojiParser.parseToAliases(event.getMeta());
+    eventDao.saveEvent(event.getUserId(), event.getEvent(), event.getPage(), meta);
   }
 
   public EventResponse getEventsByEventType(String event) {

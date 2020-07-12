@@ -24,7 +24,11 @@ public class ServerErrorExceptionMapper implements ExceptionMapper<Exception> {
   public Response toResponse(Exception exception) {
     BizUtilities bizUtilities = new BizUtilities(config);
     executor.execute(() -> {
-      bizUtilities.sendServerErrorEmail(stackToString(exception));
+      // Ignore 404 errors
+      // Google's crawler is annoying
+      if (!exception.getMessage().equals("HTTP 404 Not Found")) {
+        bizUtilities.sendServerErrorEmail(stackToString(exception));
+      }
     });
     return Response.status(500)
             .entity("{\"message\":\"An internal error occurred\"}")

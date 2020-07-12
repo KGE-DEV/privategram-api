@@ -5,6 +5,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
@@ -30,8 +31,8 @@ public class ServerErrorExceptionMapper implements ExceptionMapper<Exception> {
         bizUtilities.sendServerErrorEmail(stackToString(exception));
       }
     });
-    return Response.status(500)
-            .entity("{\"message\":\"An internal error occurred\"}")
+    return Response.status(((NotFoundException) exception).getResponse().getStatus())
+            .entity(String.format("{\"message\":\"%s\"}", exception.getMessage()))
             .type(MediaType.APPLICATION_JSON_TYPE)
             .build();
   }

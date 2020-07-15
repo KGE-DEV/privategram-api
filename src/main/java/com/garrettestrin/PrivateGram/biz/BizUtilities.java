@@ -105,4 +105,8 @@ public class BizUtilities {
         String message = exception;
         return sendEmail(to, subject, message);
     }
+
+    public void sendTestEmail () {
+        sendEmail("garrett.estrin@gmail.com", "Test Cron Email", "This is the test cron job email");
+    }
 }

@@ -9,6 +9,7 @@ import com.garrettestrin.PrivateGram.app.Auth.Auth;
 import com.garrettestrin.PrivateGram.app.Auth.AuthenticatedUserConverterProvider;
 import com.garrettestrin.PrivateGram.app.Auth.UnauthorizedExceptionMapper;
 import com.garrettestrin.PrivateGram.app.Config.AWSConfig;
+import com.garrettestrin.PrivateGram.biz.BizUtilities;
 import com.garrettestrin.PrivateGram.biz.CommentService;
 import com.garrettestrin.PrivateGram.biz.EventService;
 import com.garrettestrin.PrivateGram.biz.PostService;
@@ -43,6 +44,7 @@ class DependencyManager {
     public final AuthenticatedUserConverterProvider authenticatedUserConverterProvider;
     public final UnauthorizedExceptionMapper unauthorizedExceptionMapper;
     public final ServerErrorExceptionMapper serverErrorExceptionMapper;
+    public final BizUtilities bizUtilities;
 
 
     DependencyManager(PrivateGramConfiguration config, Environment env) {
@@ -80,6 +82,8 @@ class DependencyManager {
         authenticatedUserConverterProvider = new AuthenticatedUserConverterProvider(config);
         unauthorizedExceptionMapper = new UnauthorizedExceptionMapper();
         serverErrorExceptionMapper = new ServerErrorExceptionMapper(config);
+
+        bizUtilities = new BizUtilities(config);
 
         // HealthChecks
         HealthCheck dbHealthCheck = new DBHealthCheck("users");

@@ -5,7 +5,9 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Timer;
+import lombok.extern.jbosslog.JBossLog;
 
+@JBossLog
 public class CronUtilities {
   private final long TWENTY_FOUR_HOURS = 1000L * 60L * 60L * 24L;
 
@@ -16,6 +18,7 @@ public class CronUtilities {
   }
 
   public void scheduleDailyEmailUpdate() {
+    log.infof("ScheduleDailyEmailUpdate Cron job set to run at: " + getTodayAtMidnight());
     Timer t = new Timer();
     t.scheduleAtFixedRate(sendDailyUpdateEmail, getTodayAtMidnight(), TWENTY_FOUR_HOURS);
   }
@@ -23,14 +26,14 @@ public class CronUtilities {
   public Date getTodayAtMidnight() {
     // today
     Calendar date = new GregorianCalendar();
-    // reset hour, minutes, seconds and millis
-    date.set(Calendar.HOUR_OF_DAY, 0);
+    // reset minutes, seconds and millis
+    // 7am UTC, 12am PST
+    date.set(Calendar.HOUR_OF_DAY, 7);
+    // reset minutes, seconds and millis
     date.set(Calendar.MINUTE, 0);
     date.set(Calendar.SECOND, 0);
     date.set(Calendar.MILLISECOND, 0);
-
-    // next day
-    date.add(Calendar.DAY_OF_MONTH, 1);
+    
     return date.getTime();
   }
 

@@ -100,4 +100,9 @@ public interface UserDao extends SqlObject {
             + "SET active = 0 "
             + "WHERE id = :id")
   boolean deactivateUser(@Bind("id") int id);
+
+  @SqlQuery("SELECT * FROM elsiegram.users "
+            + "where subscribed_to_emails = 1")
+  @RegisterBeanMapper(com.garrettestrin.PrivateGram.api.ApiObjects.User.class)
+  List<com.garrettestrin.PrivateGram.api.ApiObjects.User> getSubscribedUsers();
 }

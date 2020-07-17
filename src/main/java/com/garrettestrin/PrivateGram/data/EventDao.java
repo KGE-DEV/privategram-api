@@ -35,4 +35,11 @@ public interface EventDao extends SqlObject {
           + "ORDER BY id DESC LIMIT 500")
   @RegisterBeanMapper(Event.class)
   List<Event> getLatestEvents();
+
+  @SqlQuery("SELECT ue.id, ue.event, ue.user_id, ue.page, ue.meta, ue.date_time, u.name FROM user_events as ue "
+          + "INNER JOIN users as u on ue.user_id = u.id "
+          + "WHERE user_id = :user_id "
+          + "ORDER BY id DESC LIMIT 500")
+  @RegisterBeanMapper(Event.class)
+  Event getUsersLastEvent(@Bind("user_id") long user_id);
 }

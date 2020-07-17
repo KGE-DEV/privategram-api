@@ -1,6 +1,5 @@
 package com.garrettestrin.PrivateGram.app;
 
-import com.garrettestrin.PrivateGram.biz.CronJobs.SendDailyUpdateEmail;
 import com.garrettestrin.PrivateGram.biz.CronUtilities;
 import io.dropwizard.Application;
 import io.dropwizard.configuration.ConfigurationSourceProvider;
@@ -10,7 +9,6 @@ import io.dropwizard.configuration.SubstitutingSourceProvider;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import lombok.extern.jbosslog.JBossLog;
-import lombok.val;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
 
 @JBossLog
@@ -31,7 +29,7 @@ public class PrivateGramApplication extends Application<PrivateGramConfiguration
     @Override
     public void run(PrivateGramConfiguration configuration,
                     Environment environment) {
-        val deps = new DependencyManager(configuration, environment);
+        DependencyManager deps = new DependencyManager(configuration, environment);
 
         // Register resources
         log.info("Registering Resources.");
@@ -49,8 +47,7 @@ public class PrivateGramApplication extends Application<PrivateGramConfiguration
         Cors.insecure(environment);
 
         // Register Cron Jobs on application start
-        SendDailyUpdateEmail sendDailyUpdateEmail = new SendDailyUpdateEmail(deps.bizUtilities);
-        CronUtilities cronUtilities = new CronUtilities(sendDailyUpdateEmail);
+        CronUtilities cronUtilities = new CronUtilities(deps);
         cronUtilities.scheduleDailyEmailUpdate();
     }
 

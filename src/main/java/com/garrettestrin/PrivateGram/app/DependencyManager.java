@@ -11,6 +11,7 @@ import com.garrettestrin.PrivateGram.app.Auth.UnauthorizedExceptionMapper;
 import com.garrettestrin.PrivateGram.app.Config.AWSConfig;
 import com.garrettestrin.PrivateGram.biz.BizUtilities;
 import com.garrettestrin.PrivateGram.biz.CommentService;
+import com.garrettestrin.PrivateGram.biz.CronJobs.SendDailyUpdateEmail;
 import com.garrettestrin.PrivateGram.biz.EventService;
 import com.garrettestrin.PrivateGram.biz.PostService;
 import com.garrettestrin.PrivateGram.biz.UserService;
@@ -36,7 +37,7 @@ import org.jdbi.v3.sqlobject.SqlObjectPlugin;
  */
 @JBossLog
 @Getter
-class DependencyManager {
+public class DependencyManager {
     public final UserResource userResource;
     public final CommentResource commentResource;
     public final PostResource postResource;
@@ -45,6 +46,7 @@ class DependencyManager {
     public final UnauthorizedExceptionMapper unauthorizedExceptionMapper;
     public final ServerErrorExceptionMapper serverErrorExceptionMapper;
     public final BizUtilities bizUtilities;
+    public final SendDailyUpdateEmail sendDailyUpdateEmail;
 
 
     DependencyManager(PrivateGramConfiguration config, Environment env) {
@@ -61,8 +63,8 @@ class DependencyManager {
         awsConfig = config.getAwsConfig();
 
         // UserResource
-         final UserDao userDao = db.onDemand(UserDao.class);
-         val userService = new UserService(userDao, auth, config);
+        final UserDao userDao = db.onDemand(UserDao.class);
+        val userService = new UserService(userDao, auth, config);
         userResource = new UserResource(auth, userService);
         // CommentResource
         final CommentDao commentDao = db.onDemand(CommentDao.class);
@@ -84,6 +86,9 @@ class DependencyManager {
         serverErrorExceptionMapper = new ServerErrorExceptionMapper(config);
 
         bizUtilities = new BizUtilities(config);
+
+        // Cron Job Tasks
+        sendDailyUpdateEmail = new SendDailyUpdateEmail(bizUtilities, userDao, eventDao, eventService);
 
         // HealthChecks
         HealthCheck dbHealthCheck = new DBHealthCheck("users");

@@ -1,5 +1,6 @@
 package com.garrettestrin.PrivateGram.biz;
 
+import com.garrettestrin.PrivateGram.app.DependencyManager;
 import com.garrettestrin.PrivateGram.biz.CronJobs.SendDailyUpdateEmail;
 import java.util.Calendar;
 import java.util.Date;
@@ -13,8 +14,8 @@ public class CronUtilities {
 
   private final SendDailyUpdateEmail sendDailyUpdateEmail;
 
-  public CronUtilities(SendDailyUpdateEmail sendDailyUpdateEmail) {
-    this.sendDailyUpdateEmail = sendDailyUpdateEmail;
+  public CronUtilities(DependencyManager deps) {
+    this.sendDailyUpdateEmail = deps.sendDailyUpdateEmail;
   }
 
   public void scheduleDailyEmailUpdate() {
@@ -33,7 +34,7 @@ public class CronUtilities {
     date.set(Calendar.MINUTE, 0);
     date.set(Calendar.SECOND, 0);
     date.set(Calendar.MILLISECOND, 0);
-    
+
     return date.getTime();
   }
 

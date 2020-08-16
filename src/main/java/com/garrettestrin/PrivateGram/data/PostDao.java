@@ -10,11 +10,23 @@ import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 import java.util.List;
 
 public interface PostDao extends SqlObject {
-  // TODO: JAVADOC
+  @Deprecated
   @SqlUpdate("INSERT INTO "
           + "`posts` (`post_content`, `post_image_url`) "
           +   "VALUES (:post_content, :post_image_url);")
   boolean addPost(@Bind("post_content") String post_content, @Bind("post_image_url") String post_image_url);
+
+  /**
+   * Insert new post in database
+   * @param post_content
+   * @param post_image_url
+   * @param is_private
+   * @return boolean representing successful insertion
+   */
+  @SqlUpdate("INSERT INTO "
+          + "`posts` (`post_content`, `post_image_url`, `private`) "
+          + "VALUES (:post_content, :post_image_url, :is_private);")
+  boolean addPost(@Bind("post_content") String post_content, @Bind("post_image_url") String post_image_url, @Bind("is_private") boolean is_private);
 
   @SqlQuery("SELECT * "
           + "FROM `posts` "
@@ -29,13 +41,20 @@ public interface PostDao extends SqlObject {
   @RegisterBeanMapper(Post.class)
   List<Post> getAllPosts();
 
+  /**
+   * Returns paginated list of posts
+   * that are active and correspond to the users clearance level
+   * @param lower_limit
+   * @param isAdmin
+   * @return List<Post>
+   */
   @SqlQuery("SELECT * "
           + "FROM `posts` "
-          + "WHERE active = 1 "
+          + "WHERE active = 1 and private <= :is_admin "
           + "Order by id DESC "
           + "LIMIT :lower_limit, 10")
   @RegisterBeanMapper(Post.class)
-  List<Post> getPaginatedPosts(@Bind("lower_limit") int lower_limit);
+  List<Post> getPaginatedPosts(@Bind("lower_limit") int lower_limit, @Bind("is_admin") boolean isAdmin);
 
   @SqlUpdate("UPDATE `posts` "
           + "SET post_content = :post_content "

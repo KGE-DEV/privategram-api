@@ -1,5 +1,8 @@
 package com.garrettestrin.PrivateGram.api;
 
+import static javax.ws.rs.core.MediaType.MULTIPART_FORM_DATA;
+
+
 import com.codahale.metrics.annotation.Timed;
 import com.garrettestrin.PrivateGram.api.ApiObjects.Post;
 import com.garrettestrin.PrivateGram.api.ApiObjects.PostCountResponse;
@@ -21,8 +24,6 @@ import javax.ws.rs.core.MediaType;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 
-import static javax.ws.rs.core.MediaType.MULTIPART_FORM_DATA;
-
 @Path("/post")
 @Produces(MediaType.APPLICATION_JSON)
 public class PostResource {
@@ -40,6 +41,7 @@ public class PostResource {
    * @param caption
    * @return PostResponse
    */
+  @Deprecated
   @POST
   @Path("/add")
   @Consumes(MULTIPART_FORM_DATA)
@@ -51,6 +53,27 @@ public class PostResource {
           @FormDataParam("type") String type,
           @CookieParam(AUTH_COOKIE) AuthenticatedUser authenticatedUser) throws IOException {
     return postService.addPost(caption, fileInputStream, name, type);
+  }
+
+  /**
+   * @param fileInputStream
+   * @param authenticatedUser
+   * @param caption
+   * @param isPrivate
+   * @return PostResponse
+   */
+  @POST
+  @Path("/v2/add")
+  @Consumes(MULTIPART_FORM_DATA)
+  public PostResponse addPost(
+          @FormDataParam("caption") String caption,
+          @FormDataParam("file") final InputStream fileInputStream,
+          @FormDataParam("file") final FormDataContentDisposition contentDispositionHeader,
+          @FormDataParam("name") String name,
+          @FormDataParam("type") String type,
+          @FormDataParam("isPrivate") boolean isPrivate,
+          @CookieParam(AUTH_COOKIE) AuthenticatedUser authenticatedUser) throws IOException {
+    return postService.addPost(caption, fileInputStream, name, type, isPrivate);
   }
 
   /**
@@ -73,7 +96,7 @@ public class PostResource {
   @GET
   @Path("get/paginated/{page}")
   public PostResponse getPaginatedPosts(@PathParam("page") Integer page, @CookieParam(AUTH_COOKIE) AuthenticatedUser authenticatedUser) {
-    return postService.getPaginatedPosts(page);
+    return postService.getPaginatedPosts(page, authenticatedUser.isAdmin());
   }
 
   @PUT

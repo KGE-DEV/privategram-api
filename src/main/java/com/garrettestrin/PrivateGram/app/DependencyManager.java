@@ -79,7 +79,7 @@ class DependencyManager {
         val eventService = new EventService(eventDao);
         eventResource = new EventResource(eventService, userService);
 
-        authenticatedUserConverterProvider = new AuthenticatedUserConverterProvider(config);
+        authenticatedUserConverterProvider = new AuthenticatedUserConverterProvider(config, userDao);
         unauthorizedExceptionMapper = new UnauthorizedExceptionMapper();
         serverErrorExceptionMapper = new ServerErrorExceptionMapper(config);
 

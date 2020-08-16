@@ -59,9 +59,8 @@ public class PostService {
     this.tinifyKey = tinifyKey;
     this.bizUtilities = new BizUtilities(config);
   }
-
+  @Deprecated
   public PostResponse addPost(String caption, InputStream inputStream, String name, String type) throws IOException {
-
     writeStreamToFile(inputStream, name);
     executor.execute(() -> {
       String urlString;
@@ -80,17 +79,47 @@ public class PostService {
     return PostResponse.builder().success(true).message("Your post is being processed").build();
   }
 
+  /**
+   * Processes image upload, uploads to AWS and inserts into DB
+   * Response is returned after image is uploaded to server, but before it is fully processed
+   * @param caption
+   * @param inputStream
+   * @param name
+   * @param type
+   * @param isPrivate
+   * @return
+   * @throws IOException
+   */
+  public PostResponse addPost(String caption, InputStream inputStream, String name, String type, boolean isPrivate) throws IOException {
+    writeStreamToFile(inputStream, name);
+    executor.execute(() -> {
+      String urlString;
+      try {
+        urlString = uploadToS3(resizeAndCompressImage(name), type, name);
+      } catch (IOException e) {
+        e.printStackTrace();
+        // if post failed
+        // send an email to admins
+        bizUtilities.sendPostErrorEmail(userDao.getAdminUsers(), caption);
+        return;
+      }
+      postDao.addPost(EmojiParser.parseToAliases(caption), awsConfig.getBucketUrl() + "/" + urlString, isPrivate);
+      log.info("Post was successfully processed");
+    });
+    return PostResponse.builder().success(true).message("Your post is being processed").build();
+  }
+
   public PostResponse getAllPosts() {
 
     return new PostResponse(true, null, postDao.getAllPosts());
   }
 
-  public PostResponse getPaginatedPosts(Integer lower_limit) {
+  public PostResponse getPaginatedPosts(Integer lower_limit, boolean isAdmin) {
 
     if(lower_limit > 0) {
       lower_limit = (lower_limit - 1) * 10;
     }
-    return new PostResponse(true, null, parsePostsForEmojis(postDao.getPaginatedPosts(lower_limit)));
+    return new PostResponse(true, null, parsePostsForEmojis(postDao.getPaginatedPosts(lower_limit, isAdmin)));
   }
 
   public PostResponse editPost(int postId, String postContent) {

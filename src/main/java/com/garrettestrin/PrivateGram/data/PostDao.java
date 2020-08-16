@@ -10,11 +10,23 @@ import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 import java.util.List;
 
 public interface PostDao extends SqlObject {
-  // TODO: JAVADOC
+  @Deprecated
   @SqlUpdate("INSERT INTO "
           + "`posts` (`post_content`, `post_image_url`) "
           +   "VALUES (:post_content, :post_image_url);")
   boolean addPost(@Bind("post_content") String post_content, @Bind("post_image_url") String post_image_url);
+
+  /**
+   * Insert new post in database
+   * @param post_content
+   * @param post_image_url
+   * @param is_private
+   * @return boolean representing successful insertion
+   */
+  @SqlUpdate("INSERT INTO "
+          + "`posts` (`post_content`, `post_image_url`, `private`) "
+          + "VALUES (:post_content, :post_image_url, :is_private);")
+  boolean addPost(@Bind("post_content") String post_content, @Bind("post_image_url") String post_image_url, @Bind("is_private") boolean is_private);
 
   @SqlQuery("SELECT * "
           + "FROM `posts` "

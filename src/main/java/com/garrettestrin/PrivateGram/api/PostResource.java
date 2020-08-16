@@ -96,7 +96,7 @@ public class PostResource {
   @GET
   @Path("get/paginated/{page}")
   public PostResponse getPaginatedPosts(@PathParam("page") Integer page, @CookieParam(AUTH_COOKIE) AuthenticatedUser authenticatedUser) {
-    return postService.getPaginatedPosts(page);
+    return postService.getPaginatedPosts(page, authenticatedUser.isAdmin());
   }
 
   @PUT

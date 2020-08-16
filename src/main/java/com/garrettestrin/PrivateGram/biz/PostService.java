@@ -114,12 +114,12 @@ public class PostService {
     return new PostResponse(true, null, postDao.getAllPosts());
   }
 
-  public PostResponse getPaginatedPosts(Integer lower_limit) {
+  public PostResponse getPaginatedPosts(Integer lower_limit, boolean isAdmin) {
 
     if(lower_limit > 0) {
       lower_limit = (lower_limit - 1) * 10;
     }
-    return new PostResponse(true, null, parsePostsForEmojis(postDao.getPaginatedPosts(lower_limit)));
+    return new PostResponse(true, null, parsePostsForEmojis(postDao.getPaginatedPosts(lower_limit, isAdmin)));
   }
 
   public PostResponse editPost(int postId, String postContent) {

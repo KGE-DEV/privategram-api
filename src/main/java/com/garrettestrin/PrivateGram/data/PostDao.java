@@ -41,13 +41,20 @@ public interface PostDao extends SqlObject {
   @RegisterBeanMapper(Post.class)
   List<Post> getAllPosts();
 
+  /**
+   * Returns paginated list of posts
+   * that are active and correspond to the users clearance level
+   * @param lower_limit
+   * @param isAdmin
+   * @return List<Post>
+   */
   @SqlQuery("SELECT * "
           + "FROM `posts` "
-          + "WHERE active = 1 "
+          + "WHERE active = 1 and private <= :is_admin "
           + "Order by id DESC "
           + "LIMIT :lower_limit, 10")
   @RegisterBeanMapper(Post.class)
-  List<Post> getPaginatedPosts(@Bind("lower_limit") int lower_limit);
+  List<Post> getPaginatedPosts(@Bind("lower_limit") int lower_limit, @Bind("is_admin") boolean isAdmin);
 
   @SqlUpdate("UPDATE `posts` "
           + "SET post_content = :post_content "

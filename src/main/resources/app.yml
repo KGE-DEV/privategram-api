@@ -21,6 +21,9 @@ salt: ${dw.salt}
 secretKey: ${dw.secretKey}
 authToken: ${dw.authToken}
 
+siteDomain: ${dw.siteDomain}
+siteName: ${dw.siteName}
+
 #email
 emailUser: ${dw.emailUser}
 emailHost: ${dw.emailHost}
@@ -33,6 +36,7 @@ awsConfig:
   bucket: ${dw.awsConfig.bucket}
   bucketUrl: ${dw.awsConfig.bucketUrl}
   s3Region: ${dw.awsConfig.s3Region}
+
 
 
 

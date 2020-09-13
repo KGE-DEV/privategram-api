@@ -1,7 +1,5 @@
 package com.garrettestrin.PrivateGram.app;
 
-import com.garrettestrin.PrivateGram.biz.CronJobs.SendDailyUpdateEmail;
-import com.garrettestrin.PrivateGram.biz.CronUtilities;
 import io.dropwizard.Application;
 import io.dropwizard.configuration.ConfigurationSourceProvider;
 import io.dropwizard.configuration.EnvironmentVariableSubstitutor;
@@ -49,9 +47,9 @@ public class PrivateGramApplication extends Application<PrivateGramConfiguration
         Cors.insecure(environment);
 
         // Register Cron Jobs on application start
-        SendDailyUpdateEmail sendDailyUpdateEmail = new SendDailyUpdateEmail(deps.bizUtilities);
-        CronUtilities cronUtilities = new CronUtilities(sendDailyUpdateEmail);
-        cronUtilities.scheduleDailyEmailUpdate();
+//        SendDailyUpdateEmail sendDailyUpdateEmail = new SendDailyUpdateEmail(deps.bizUtilities);
+//        CronUtilities cronUtilities = new CronUtilities(sendDailyUpdateEmail);
+//        cronUtilities.scheduleDailyEmailUpdate();
     }
 
 }

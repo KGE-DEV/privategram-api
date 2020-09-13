@@ -1,5 +1,8 @@
 package com.garrettestrin.PrivateGram.biz;
 
+import static org.apache.http.util.TextUtils.isEmpty;
+
+
 import com.garrettestrin.PrivateGram.api.ApiObjects.InvitesResponse;
 import com.garrettestrin.PrivateGram.api.ApiObjects.JWTToken;
 import com.garrettestrin.PrivateGram.api.ApiObjects.UserResponse;
@@ -27,8 +30,6 @@ import java.util.Random;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import static org.apache.http.util.TextUtils.isEmpty;
 
 public class UserService {
 

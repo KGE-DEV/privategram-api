@@ -79,7 +79,7 @@ public class BizUtilities {
     public boolean newUserPasswordSet(String userEmail, String token) {
         String to = userEmail;
         String subject = String.format(newUserPasswordResetSubject, siteName);
-        String message = String.format(newUserPasswordResetMessage + token + "&set=true&email=" + userEmail, siteName, siteUrl);
+        String message = String.format(newUserPasswordResetMessage, siteName, siteUrl, token, userEmail);
         return sendEmail(to, subject, message);
     }
 

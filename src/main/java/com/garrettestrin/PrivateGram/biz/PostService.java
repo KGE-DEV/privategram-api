@@ -10,6 +10,11 @@ import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.amazonaws.util.IOUtils;
+import com.drew.imaging.ImageMetadataReader;
+import com.drew.imaging.ImageProcessingException;
+import com.drew.metadata.Directory;
+import com.drew.metadata.Metadata;
+import com.drew.metadata.Tag;
 import com.garrettestrin.PrivateGram.api.ApiObjects.PostCountResponse;
 import com.garrettestrin.PrivateGram.api.ApiObjects.PostResponse;
 import com.garrettestrin.PrivateGram.app.Config.AWSConfig;
@@ -21,6 +26,8 @@ import com.tinify.Options;
 import com.tinify.Source;
 import com.tinify.Tinify;
 import com.vdurmont.emoji.EmojiParser;
+import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -65,8 +72,8 @@ public class PostService {
     executor.execute(() -> {
       String urlString;
       try {
-        urlString = uploadToS3(resizeAndCompressImage(name), type, name);
-      } catch (IOException e) {
+        urlString = uploadToS3(resizeAndCompressImage(name, 0, 0), type, name);
+      } catch (IOException | ImageProcessingException e) {
         e.printStackTrace();
         // if post failed
         // send an email to admins
@@ -90,13 +97,13 @@ public class PostService {
    * @return
    * @throws IOException
    */
-  public PostResponse addPost(String caption, InputStream inputStream, String name, String type, boolean isPrivate) throws IOException {
+  public PostResponse addPost(String caption, InputStream inputStream, String name, String type, boolean isPrivate, int height, int width) throws IOException {
     writeStreamToFile(inputStream, name);
     executor.execute(() -> {
       String urlString;
       try {
-        urlString = uploadToS3(resizeAndCompressImage(name), type, name);
-      } catch (IOException e) {
+        urlString = uploadToS3(resizeAndCompressImage(name, height, width), type, name);
+      } catch (IOException | ImageProcessingException e) {
         e.printStackTrace();
         // if post failed
         // send an email to admins
@@ -182,9 +189,30 @@ public class PostService {
     return pathName;
   }
 
-  private String resizeAndCompressImage(String name) throws IOException {
+  private String resizeAndCompressImage(String name, int postedHeight, int postedWidth) throws IOException, ImageProcessingException {
     Tinify.setKey(tinifyKey);
     String pathToFile = "tmp/" + name;
+//    compare uploaded height and width to saved file
+//    if different, the image needs to be rotated
+    if (postedHeight > 0 && postedWidth > 0) {
+      int actualHeight = 0;
+      int actualWidth = 0;
+      Metadata metadata = ImageMetadataReader.readMetadata(new File(pathToFile));
+      for (Directory directory : metadata.getDirectories()) {
+        for (Tag tag : directory.getTags()) {
+          if (tag.getTagName().equals("Image Height")) {
+            actualHeight = Integer.parseInt(tag.getDescription().split(" ")[0]);
+          }
+          if (tag.getTagName().equals("Image Width")) {
+            actualWidth = Integer.parseInt(tag.getDescription().split(" ")[0]);
+          }
+        }
+      }
+      if (actualHeight != postedHeight && actualWidth != postedWidth && actualHeight != 0 && actualWidth != 0) {
+        rotateImage(pathToFile);
+      }
+    }
+
     Source source = Tinify.fromFile(pathToFile);
     Options options = new Options()
             .with("method", "scale")
@@ -192,6 +220,25 @@ public class PostService {
     Source resized = source.resize(options);
     resized.toFile(pathToFile);
     return pathToFile;
+  }
+
+  private void rotateImage(String pathToFile) throws IOException {
+    BufferedImage image = ImageIO.read(new File(pathToFile));
+    final double rads = Math.toRadians(90);
+    final double sin = Math.abs(Math.sin(rads));
+    final double cos = Math.abs(Math.cos(rads));
+    final int w = (int) Math.floor(image.getWidth() * cos + image.getHeight() * sin);
+    final int h = (int) Math.floor(image.getHeight() * cos + image.getWidth() * sin);
+    final BufferedImage rotatedImage = new BufferedImage(w, h, image.getType());
+    final AffineTransform at = new AffineTransform();
+    at.translate(w / 2, h / 2);
+    at.rotate(rads,0, 0);
+    at.translate(-image.getWidth() / 2, -image.getHeight() / 2);
+    final AffineTransformOp rotateOp = new AffineTransformOp(at, AffineTransformOp.TYPE_BILINEAR);
+    rotateOp.filter(image,rotatedImage);
+    String[] typeArray = pathToFile.split("\\.");
+    String type = typeArray[1].toUpperCase();
+    ImageIO.write(rotatedImage, type, new File(pathToFile));
   }
 
   private List<Post> parsePostsForEmojis(List<Post> posts) {

@@ -72,8 +72,10 @@ public class PostResource {
           @FormDataParam("name") String name,
           @FormDataParam("type") String type,
           @FormDataParam("isPrivate") boolean isPrivate,
+          @FormDataParam("height") int height,
+          @FormDataParam("width") int width,
           @CookieParam(AUTH_COOKIE) AuthenticatedUser authenticatedUser) throws IOException {
-    return postService.addPost(caption, fileInputStream, name, type, isPrivate);
+    return postService.addPost(caption, fileInputStream, name, type, isPrivate, height, width);
   }
 
   /**

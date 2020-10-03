@@ -69,4 +69,18 @@ public interface PostDao extends SqlObject {
   @SqlQuery("SELECT COUNT(*) FROM posts "
           + "WHERE active = 1")
   int postCount();
+
+  /**
+   * Returns an individual post
+   * that is active and correspond to the users clearance level
+   * @param postId
+   * @param isAdmin
+   * @return List<Post>
+   */
+  @SqlQuery("SELECT * "
+          + "FROM `posts` "
+          + "WHERE active = 1 and private <= :isAdmin and id = :postId "
+          + "LIMIT 1")
+  @RegisterBeanMapper(Post.class)
+  List<Post> getIndividualPost(@Bind("postId") Integer postId, @Bind("isAdmin") boolean isAdmin);
 }

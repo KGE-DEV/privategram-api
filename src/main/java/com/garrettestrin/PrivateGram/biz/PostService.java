@@ -250,4 +250,8 @@ public class PostService {
     }
     return parsedPosts;
   }
+
+  public PostResponse getIndvidualPost(Integer pageId, boolean admin) {
+    return PostResponse.builder().posts(postDao.getIndividualPost(pageId, admin)).build();
+  }
 }

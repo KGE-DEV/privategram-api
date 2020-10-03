@@ -101,6 +101,17 @@ public class PostResource {
     return postService.getPaginatedPosts(page, authenticatedUser.isAdmin());
   }
 
+  /**
+   * @param pageId
+   * @param authenticatedUser
+   * @return PostResponse
+   */
+  @GET
+  @Path("get/{pageId}")
+  public PostResponse getIndividualPost(@PathParam("pageId") Integer pageId, @CookieParam(AUTH_COOKIE) AuthenticatedUser authenticatedUser) {
+    return postService.getIndvidualPost(pageId, authenticatedUser.isAdmin());
+  }
+
   @PUT
   @Path("/edit")
   @Timed

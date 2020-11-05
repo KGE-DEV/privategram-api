@@ -6,11 +6,15 @@ import static javax.ws.rs.core.MediaType.MULTIPART_FORM_DATA;
 import com.codahale.metrics.annotation.Timed;
 import com.garrettestrin.PrivateGram.api.ApiObjects.Post;
 import com.garrettestrin.PrivateGram.api.ApiObjects.PostCountResponse;
+import com.garrettestrin.PrivateGram.api.ApiObjects.PostImage;
 import com.garrettestrin.PrivateGram.api.ApiObjects.PostResponse;
 import com.garrettestrin.PrivateGram.app.Auth.AuthenticatedUser;
 import com.garrettestrin.PrivateGram.biz.PostService;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.CookieParam;
 import javax.ws.rs.DELETE;
@@ -21,8 +25,14 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+
+import lombok.val;
+import org.glassfish.jersey.media.multipart.FormDataBodyPart;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
+import org.glassfish.jersey.media.multipart.FormDataMultiPart;
 import org.glassfish.jersey.media.multipart.FormDataParam;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 @Path("/post")
 @Produces(MediaType.APPLICATION_JSON)
@@ -76,6 +86,40 @@ public class PostResource {
           @FormDataParam("width") int width,
           @CookieParam(AUTH_COOKIE) AuthenticatedUser authenticatedUser) throws IOException {
     return postService.addPost(caption, fileInputStream, name, type, isPrivate, height, width);
+  }
+
+  /**
+   * @param authenticatedUser
+   * @param caption
+   * @param isPrivate
+   * @return PostResponse
+   */
+  @POST
+  @Path("/v3/add")
+  @Consumes(MULTIPART_FORM_DATA)
+  public PostResponse addPost(
+          @FormDataParam("caption") String caption,
+          @FormDataParam("isPrivate") boolean isPrivate,
+          @FormDataParam("fileData") JSONArray filesData,
+          FormDataMultiPart multiPart,
+          @CookieParam(AUTH_COOKIE) AuthenticatedUser authenticatedUser) throws IOException {
+    List<PostImage> images = new ArrayList<PostImage>();
+    List<FormDataBodyPart> bodyParts =
+            multiPart.getFields("file");
+    int iterator = 0;
+    for (FormDataBodyPart part : bodyParts) {
+      JSONObject fileData = (JSONObject) filesData.get(iterator);
+      images.add(PostImage.builder()
+              .name(fileData.getString("name"))
+              .file(part.getValueAs(InputStream.class))
+              .height(fileData.getInt("height"))
+              .width(fileData.getInt("width"))
+              .type(fileData.getString("type"))
+              .build());
+      iterator++;
+    }
+//    postService.addPost(caption, bodyParts.get(0).getValueAs(InputStream.class), "file.jpg", bodyParts.get(0).getMediaType().toString(),isPrivate, 10, 10);
+    return PostResponse.builder().build();
   }
 
   /**

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.garrettestrin.PrivateGram.api.ApiObjects.PostResponse;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,10 +26,10 @@ public class Cache {
         return mapper.writeValueAsString(value);
     }
 
-//    public String decode(String key, String classType) {
-//        ObjectMapper mapper = new ObjectMapper();
-//        return mapper.readValue(cachedPosts, PostResponse.class);
-//    }
+    public <T> T decode(String value, Class<T> clazz) throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        return mapper.readValue(value, clazz);
+    }
 
     public void clearPostCache() {
         postCache.clear();

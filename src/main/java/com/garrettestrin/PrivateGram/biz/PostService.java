@@ -138,9 +138,7 @@ public class PostService {
     String cachedPosts = cache.getPost(cache.POST_PAGE + page);
     // if data is cached
     if (null != cachedPosts) {
-      ObjectMapper mapper = new ObjectMapper();
-      PostResponse postResponse = mapper.readValue(cachedPosts, PostResponse.class);
-      return postResponse;
+      return cache.decode(cachedPosts, PostResponse.class);
     }
     // if no data in cache, get from db and then cache
     // then return data

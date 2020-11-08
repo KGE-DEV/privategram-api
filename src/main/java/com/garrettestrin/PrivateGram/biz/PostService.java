@@ -15,10 +15,12 @@ import com.drew.imaging.ImageProcessingException;
 import com.drew.metadata.Directory;
 import com.drew.metadata.Metadata;
 import com.drew.metadata.Tag;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.garrettestrin.PrivateGram.api.ApiObjects.PostCountResponse;
 import com.garrettestrin.PrivateGram.api.ApiObjects.PostResponse;
 import com.garrettestrin.PrivateGram.app.Config.AWSConfig;
 import com.garrettestrin.PrivateGram.app.PrivateGramConfiguration;
+import com.garrettestrin.PrivateGram.data.Cache;
 import com.garrettestrin.PrivateGram.data.DataObjects.Post;
 import com.garrettestrin.PrivateGram.data.PostDao;
 import com.garrettestrin.PrivateGram.data.UserDao;
@@ -35,10 +37,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import javax.imageio.ImageIO;
 import lombok.extern.jbosslog.JBossLog;
+import org.json.JSONObject;
 
 @JBossLog
 public class PostService {
@@ -52,12 +56,14 @@ public class PostService {
   private final String DELETED_POST_FAIL = "post was not deleted";
   private final String EDITED_POST_SUCCESS = "post was edited";
   private final String EDITED_POST_FAIL = "post was not edited";
+
   private final int MAX_THREADS = 50;
   private final String tinifyKey;
   private final Executor executor = Executors.newFixedThreadPool(MAX_THREADS);
   private final BizUtilities bizUtilities;
+  private final Cache cache;
 
-  public PostService(PostDao postDao, AWSConfig awsConfig, String tinifyKey, PrivateGramConfiguration config, UserDao userDao) {
+  public PostService(PostDao postDao, AWSConfig awsConfig, String tinifyKey, PrivateGramConfiguration config, UserDao userDao, Cache cache) {
 
     this.postDao = postDao;
     this.userDao = userDao;
@@ -65,6 +71,7 @@ public class PostService {
     this.regions = Regions.fromName(awsConfig.getS3Region());
     this.tinifyKey = tinifyKey;
     this.bizUtilities = new BizUtilities(config);
+    this.cache = cache;
   }
   @Deprecated
   public PostResponse addPost(String caption, InputStream inputStream, String name, String type) throws IOException {
@@ -98,6 +105,7 @@ public class PostService {
    * @throws IOException
    */
   public PostResponse addPost(String caption, InputStream inputStream, String name, String type, boolean isPrivate, int height, int width) throws IOException {
+    cache.clearPostCache();
     writeStreamToFile(inputStream, name);
     executor.execute(() -> {
       String urlString;
@@ -121,15 +129,28 @@ public class PostService {
     return new PostResponse(true, null, postDao.getAllPosts());
   }
 
-  public PostResponse getPaginatedPosts(Integer lower_limit, boolean isAdmin) {
-
+  public PostResponse getPaginatedPosts(Integer lower_limit, boolean isAdmin) throws IOException {
+    String page = lower_limit.toString();
     if(lower_limit > 0) {
       lower_limit = (lower_limit - 1) * 10;
     }
-    return new PostResponse(true, null, parsePostsForEmojis(postDao.getPaginatedPosts(lower_limit, isAdmin)));
+    // check cache for data
+    String cachedPosts = cache.getPost(cache.POST_PAGE + page);
+    // if data is cached
+    if (null != cachedPosts) {
+      ObjectMapper mapper = new ObjectMapper();
+      PostResponse postResponse = mapper.readValue(cachedPosts, PostResponse.class);
+      return postResponse;
+    }
+    // if no data in cache, get from db and then cache
+    // then return data
+    PostResponse postResponse = new PostResponse(true, null, parsePostsForEmojis(postDao.getPaginatedPosts(lower_limit, isAdmin)));
+    cache.setPost(cache.POST_PAGE + page, cache.encode(postResponse));
+    return postResponse;
   }
 
   public PostResponse editPost(int postId, String postContent) {
+    cache.clearPostCache();
     boolean wasPostEdited = postDao.editPost(postId, EmojiParser.parseToAliases(postContent));
     String postEditedMessage = wasPostEdited ? EDITED_POST_SUCCESS : EDITED_POST_FAIL;
     List<Post> updatedPost = postDao.getPost(postId);
@@ -137,6 +158,7 @@ public class PostService {
   }
 
   public PostResponse deletePost(int postId) {
+    cache.clearPostCache();
     boolean wasPostDeleted = postDao.deletePost(postId);
     String postDeletedMessage = wasPostDeleted ? DELETED_POST_SUCCESS : DELETED_POST_FAIL;
     return new PostResponse(wasPostDeleted, postDeletedMessage, null);

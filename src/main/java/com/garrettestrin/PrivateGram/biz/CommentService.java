@@ -35,8 +35,16 @@ public class CommentService {
     return new CommentResponse(wasCommentPosted, null, null);
   }
 
-  public CommentResponse getCommentsPreview(int post_id) {
-    List<Comment> comments = parseCommentsForEmojis(commentDao.getCommentsPreview(post_id));
+  public CommentResponse getCommentsPreview(int postId) throws IOException {
+    // check cache for data
+    String cachedComments = cache.getComments(cache.PREVIEW_COMMENTS_FOR_ + postId);
+    // if data is cached
+    if (null != cachedComments) {
+      List<Comment> comments = cache.decode(cachedComments, List.class);
+      return new CommentResponse(true, null, comments);
+    }
+    List<Comment> comments = parseCommentsForEmojis(commentDao.getCommentsPreview(postId));
+    cache.setComments(cache.PREVIEW_COMMENTS_FOR_ + postId, cache.encode(comments));
     return new CommentResponse(true, null, comments);
   }
 

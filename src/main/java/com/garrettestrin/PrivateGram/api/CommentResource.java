@@ -38,7 +38,7 @@ public class CommentResource {
   @GET
   @Path("get/preview")
   @Timed
-  public CommentResponse getCommentsPreview(@QueryParam("post_id") int post_id, @CookieParam(AUTH_COOKIE) AuthenticatedUser authenticatedUser) {
+  public CommentResponse getCommentsPreview(@QueryParam("post_id") int post_id, @CookieParam(AUTH_COOKIE) AuthenticatedUser authenticatedUser) throws IOException {
     return commentService.getCommentsPreview(post_id);
   }
 

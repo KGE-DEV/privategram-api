@@ -125,7 +125,6 @@ public class PostService {
   }
 
   public PostResponse getAllPosts() {
-
     return new PostResponse(true, null, postDao.getAllPosts());
   }
 
@@ -163,7 +162,13 @@ public class PostService {
   }
 
   public PostCountResponse postCount() {
-    return new PostCountResponse(postDao.postCount());
+    String postCountCache = cache.getPost(cache.POST_COUNT);
+    if (null != postCountCache) {
+      return new PostCountResponse(Integer.parseInt(postCountCache));
+    }
+    int postCount = postDao.postCount();
+    cache.setPost(cache.POST_COUNT, String.valueOf(postCount));
+    return new PostCountResponse(postCount);
   }
 
   private String uploadToS3(String fileName, String type, String name) {

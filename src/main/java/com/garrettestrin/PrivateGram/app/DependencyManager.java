@@ -70,7 +70,7 @@ class DependencyManager {
         userResource = new UserResource(auth, userService);
         // CommentResource
         final CommentDao commentDao = db.onDemand(CommentDao.class);
-        val commentService = new CommentService(commentDao);
+        val commentService = new CommentService(commentDao, cache);
         commentResource = new CommentResource(commentService);
 
         // PostResource

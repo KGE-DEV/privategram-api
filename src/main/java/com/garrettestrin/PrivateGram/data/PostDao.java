@@ -67,8 +67,8 @@ public interface PostDao extends SqlObject {
   boolean deletePost(@Bind("post_id") int postId);
 
   @SqlQuery("SELECT COUNT(*) FROM posts "
-          + "WHERE active = 1")
-  int postCount();
+          + "WHERE active = 1 and private <= :isAdmin")
+  int postCount(@Bind("isAdmin") boolean isAdmin);
 
   /**
    * Returns an individual post

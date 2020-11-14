@@ -130,6 +130,6 @@ public class PostResource {
   @Path("/count")
   @Timed
   public PostCountResponse postCount(@CookieParam(AUTH_COOKIE) AuthenticatedUser authenticatedUser) {
-    return postService.postCount();
+    return postService.postCount(authenticatedUser.isAdmin());
   }
 }

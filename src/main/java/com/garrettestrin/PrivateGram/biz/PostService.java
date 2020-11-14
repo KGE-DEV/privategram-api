@@ -134,7 +134,7 @@ public class PostService {
       lower_limit = (lower_limit - 1) * 10;
     }
     // check cache for data
-    String cachedPosts = cache.getPost(cache.POST_PAGE + page);
+    String cachedPosts = cache.getPost(cache.POST_PAGE + page, isAdmin);
     // if data is cached
     if (null != cachedPosts) {
       return cache.decode(cachedPosts, PostResponse.class);
@@ -142,7 +142,7 @@ public class PostService {
     // if no data in cache, get from db and then cache
     // then return data
     PostResponse postResponse = new PostResponse(true, null, parsePostsForEmojis(postDao.getPaginatedPosts(lower_limit, isAdmin)));
-    cache.setPost(cache.POST_PAGE + page, cache.encode(postResponse));
+    cache.setPost(cache.POST_PAGE + page, cache.encode(postResponse), isAdmin);
     return postResponse;
   }
 
@@ -161,13 +161,13 @@ public class PostService {
     return new PostResponse(wasPostDeleted, postDeletedMessage, null);
   }
 
-  public PostCountResponse postCount() {
-    String postCountCache = cache.getPost(cache.POST_COUNT);
-    if (null != postCountCache) {
-      return new PostCountResponse(Integer.parseInt(postCountCache));
+  public PostCountResponse postCount(boolean isAdmin) {
+    String postCountCached = cache.getPost(cache.POST_COUNT, isAdmin);
+    if (null != postCountCached) {
+      return new PostCountResponse(Integer.parseInt(postCountCached));
     }
-    int postCount = postDao.postCount();
-    cache.setPost(cache.POST_COUNT, String.valueOf(postCount));
+    int postCount = postDao.postCount(isAdmin);
+    cache.setPost(cache.POST_COUNT, String.valueOf(postCount), isAdmin);
     return new PostCountResponse(postCount);
   }
 

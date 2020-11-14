@@ -18,11 +18,18 @@ public class Cache {
     public final String PREVIEW_COMMENTS_FOR_ = "PREVIEW_COMMENTS_FOR_";
 
     // Post Cache
-    public void setPost(String key, String value) {
-        postCache.put(key, value);
+    public void setPost(String key, String value, boolean admin) {
+        if (admin) {
+            postCache.put(key + "_PRIVATE", value);
+        } else {
+            postCache.put(key, value);
+        }
     }
 
-    public String getPost(String key) {
+    public String getPost(String key, boolean admin) {
+        if (admin) {
+            return postCache.get(key + "_PRIVATE");
+        }
         return postCache.get(key);
     }
 

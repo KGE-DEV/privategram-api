@@ -9,7 +9,7 @@ server:
 # Database settings.
 database:
   # the name of the JDBC driver, mysql in our case
-  driverClass: com.mysql.jdbc.Driver
+  driverClass: com.mysql.cj.jdbc.Driver
   # the username
   user: ${dw.database.user}
   # the password

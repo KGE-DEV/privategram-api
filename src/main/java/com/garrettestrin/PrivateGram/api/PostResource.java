@@ -141,7 +141,7 @@ public class PostResource {
    */
   @GET
   @Path("get/paginated/{page}")
-  public PostResponse getPaginatedPosts(@PathParam("page") Integer page, @CookieParam(AUTH_COOKIE) AuthenticatedUser authenticatedUser) {
+  public PostResponse getPaginatedPosts(@PathParam("page") Integer page, @CookieParam(AUTH_COOKIE) AuthenticatedUser authenticatedUser) throws IOException {
     return postService.getPaginatedPosts(page, authenticatedUser.isAdmin());
   }
 
@@ -174,6 +174,6 @@ public class PostResource {
   @Path("/count")
   @Timed
   public PostCountResponse postCount(@CookieParam(AUTH_COOKIE) AuthenticatedUser authenticatedUser) {
-    return postService.postCount();
+    return postService.postCount(authenticatedUser.isAdmin());
   }
 }

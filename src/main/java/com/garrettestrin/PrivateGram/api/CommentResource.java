@@ -8,6 +8,7 @@ import com.garrettestrin.PrivateGram.biz.CommentService;
 import io.dropwizard.jersey.PATCH;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import java.io.IOException;
 
 @Path("/comment")
 @Produces(MediaType.APPLICATION_JSON)
@@ -30,14 +31,14 @@ public class CommentResource {
   @GET
   @Path("get/all")
   @Timed
-  public CommentResponse getAllComments(@QueryParam("post_id") int post_id, @CookieParam(AUTH_COOKIE) AuthenticatedUser authenticatedUser) {
+  public CommentResponse getAllComments(@QueryParam("post_id") int post_id, @CookieParam(AUTH_COOKIE) AuthenticatedUser authenticatedUser) throws IOException {
     return commentService.getAllComments(post_id);
   }
 
   @GET
   @Path("get/preview")
   @Timed
-  public CommentResponse getCommentsPreview(@QueryParam("post_id") int post_id, @CookieParam(AUTH_COOKIE) AuthenticatedUser authenticatedUser) {
+  public CommentResponse getCommentsPreview(@QueryParam("post_id") int post_id, @CookieParam(AUTH_COOKIE) AuthenticatedUser authenticatedUser) throws IOException {
     return commentService.getCommentsPreview(post_id);
   }
 

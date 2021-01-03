@@ -14,6 +14,7 @@ import com.garrettestrin.PrivateGram.biz.CommentService;
 import com.garrettestrin.PrivateGram.biz.EventService;
 import com.garrettestrin.PrivateGram.biz.PostService;
 import com.garrettestrin.PrivateGram.biz.UserService;
+import com.garrettestrin.PrivateGram.data.Cache;
 import com.garrettestrin.PrivateGram.data.CommentDao;
 import com.garrettestrin.PrivateGram.data.EventDao;
 import com.garrettestrin.PrivateGram.data.PostDao;
@@ -53,6 +54,9 @@ class DependencyManager {
         final JdbiFactory factory = new JdbiFactory();
         Jdbi db = newDatabase(factory, env, config.getDatabase(), "database");
 
+        // create in memory cache
+        Cache cache = new Cache();
+
         final Auth auth = new Auth(config);
         // aws
         AWSConfig awsConfig;
@@ -66,12 +70,12 @@ class DependencyManager {
         userResource = new UserResource(auth, userService);
         // CommentResource
         final CommentDao commentDao = db.onDemand(CommentDao.class);
-        val commentService = new CommentService(commentDao);
+        val commentService = new CommentService(commentDao, cache);
         commentResource = new CommentResource(commentService);
 
         // PostResource
         final PostDao postDao = db.onDemand(PostDao.class);
-        val postService = new PostService(postDao, awsConfig, config.getTinypngKey(), config, userDao);
+        val postService = new PostService(postDao, awsConfig, config.getTinypngKey(), config, userDao, cache);
         postResource = new PostResource(postService);
 
         // EventResource

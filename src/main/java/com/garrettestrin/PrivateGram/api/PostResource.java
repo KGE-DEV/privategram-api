@@ -21,8 +21,11 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
+import org.glassfish.jersey.media.multipart.FormDataMultiPart;
 import org.glassfish.jersey.media.multipart.FormDataParam;
+import org.json.JSONArray;
 
 @Path("/post")
 @Produces(MediaType.APPLICATION_JSON)
@@ -80,6 +83,24 @@ public class PostResource {
 
   /**
    * @param authenticatedUser
+   * @param caption
+   * @param isPrivate
+   * @return PostResponse
+   */
+  @POST
+  @Path("/v3/add")
+  @Consumes(MULTIPART_FORM_DATA)
+  public PostResponse addPost(
+          @FormDataParam("caption") String caption,
+          @FormDataParam("isPrivate") boolean isPrivate,
+          @FormDataParam("fileData") JSONArray filesData,
+          FormDataMultiPart multiPart,
+          @CookieParam(AUTH_COOKIE) AuthenticatedUser authenticatedUser) throws IOException {
+    return postService.handleMultiPost(caption, isPrivate, filesData, multiPart);
+  }
+
+  /**
+   * @param authenticatedUser
    * @return PostResponse
    */
   @GET
@@ -109,7 +130,7 @@ public class PostResource {
   @GET
   @Path("get/{pageId}")
   public PostResponse getIndividualPost(@PathParam("pageId") Integer pageId, @CookieParam(AUTH_COOKIE) AuthenticatedUser authenticatedUser) {
-    return postService.getIndvidualPost(pageId, authenticatedUser.isAdmin());
+    return postService.getIndividualPost(pageId, authenticatedUser.isAdmin());
   }
 
   @PUT

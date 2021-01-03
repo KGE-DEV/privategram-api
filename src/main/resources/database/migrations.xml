@@ -126,4 +126,7 @@
             </column>
         </addColumn>
     </changeSet>
+    <changeSet author="garrettestrin" id="1597548061351-8">
+        <modifyDataType columnName="post_image_url" tableName="posts" newDataType="varchar(2000)"/>
+    </changeSet>
 </databaseChangeLog>

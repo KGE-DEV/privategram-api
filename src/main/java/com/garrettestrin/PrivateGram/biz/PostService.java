@@ -15,7 +15,6 @@ import com.drew.imaging.ImageProcessingException;
 import com.drew.metadata.Directory;
 import com.drew.metadata.Metadata;
 import com.drew.metadata.Tag;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.garrettestrin.PrivateGram.api.ApiObjects.PostCountResponse;
 import com.garrettestrin.PrivateGram.api.ApiObjects.PostResponse;
 import com.garrettestrin.PrivateGram.app.Config.AWSConfig;
@@ -28,6 +27,13 @@ import com.tinify.Options;
 import com.tinify.Source;
 import com.tinify.Tinify;
 import com.vdurmont.emoji.EmojiParser;
+import lombok.extern.jbosslog.JBossLog;
+import org.glassfish.jersey.media.multipart.FormDataBodyPart;
+import org.glassfish.jersey.media.multipart.FormDataMultiPart;
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import javax.imageio.ImageIO;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
@@ -37,12 +43,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
-import javax.imageio.ImageIO;
-import lombok.extern.jbosslog.JBossLog;
-import org.json.JSONObject;
 
 @JBossLog
 public class PostService {
@@ -105,7 +107,6 @@ public class PostService {
    * @throws IOException
    */
   public PostResponse addPost(String caption, InputStream inputStream, String name, String type, boolean isPrivate, int height, int width) throws IOException {
-    cache.clearPostCache();
     writeStreamToFile(inputStream, name);
     executor.execute(() -> {
       String urlString;
@@ -119,6 +120,7 @@ public class PostService {
         return;
       }
       postDao.addPost(EmojiParser.parseToAliases(caption), awsConfig.getBucketUrl() + "/" + urlString, isPrivate);
+      cache.clearPostCache();
       log.info("Post was successfully processed");
     });
     return PostResponse.builder().success(true).message("Your post is being processed").build();
@@ -276,7 +278,71 @@ public class PostService {
     return parsedPosts;
   }
 
-  public PostResponse getIndvidualPost(Integer pageId, boolean admin) {
+  public PostResponse getIndividualPost(Integer pageId, boolean admin) {
     return PostResponse.builder().posts(postDao.getIndividualPost(pageId, admin)).build();
   }
+
+  public PostResponse handleMultiPost(String caption, boolean isPrivate, JSONArray filesData, FormDataMultiPart multiPart) throws IOException {
+    List<FormDataBodyPart> bodyParts =
+            multiPart.getFields("file");
+//    List imageUrls = new ArrayList(Arrays.asList(bodyParts.size()));
+    List imageUrls = new ArrayList();
+    int iterator = 0;
+    for (FormDataBodyPart part : bodyParts) {
+      imageUrls.add(null);
+    }
+    for (FormDataBodyPart part : bodyParts) {
+      JSONObject fileData = (JSONObject) filesData.get(iterator);
+      writeStreamToFile(part.getValueAs(InputStream.class), fileData.getString("name"));
+      executor.execute(() -> {
+        try {
+          imageUrls.set(fileData.getInt("order"), addMultiPost(caption, fileData.getString("name"), fileData.getString("type"), fileData.getInt("height"), fileData.getInt("width")));
+        } catch (IOException e) {
+          e.printStackTrace();
+        }
+      });
+      iterator++;
+    }
+    // new thread to handle saving to db
+    executor.execute(() -> {
+      while (doesArrayContainNull(imageUrls)) { }
+      postDao.addPost(EmojiParser.parseToAliases(caption), String.join(",", imageUrls), isPrivate);
+      cache.clearPostCache();
+      log.info("Post was successfully processed");
+    });
+    return PostResponse.builder().success(true).message("Your post is being processed").build();
+  }
+
+  private boolean doesArrayContainNull(List imageUrls) {
+    for (Object url:imageUrls) {
+      if (null == url) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Processes image upload, uploads to AWS and inserts into DB
+   * Response is returned after image is uploaded to server, but before it is fully processed
+   * @param caption
+   * @param name
+   * @param type
+   * @return
+   * @throws IOException
+   */
+  private String addMultiPost(String caption, String name, String type, int height, int width) throws IOException {
+      String urlString;
+      try {
+        urlString = uploadToS3(resizeAndCompressImage(name, height, width), type, name);
+      } catch (IOException | ImageProcessingException e) {
+        e.printStackTrace();
+        // if post failed
+        // send an email to admins
+        bizUtilities.sendPostErrorEmail(userDao.getAdminUsers(), caption);
+        return "";
+      }
+      return awsConfig.getBucketUrl() + "/" + urlString;
+    }
+
 }

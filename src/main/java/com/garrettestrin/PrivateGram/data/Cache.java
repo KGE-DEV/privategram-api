@@ -44,6 +44,11 @@ public class Cache {
 
     public void removeCommentCache(String key) {commentCache.remove(key); }
 
+    public void clearCommentCache() {
+        commentCache.clear();
+    }
+
+    // Utilities
     public String encode(Object value) throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
         return mapper.writeValueAsString(value);

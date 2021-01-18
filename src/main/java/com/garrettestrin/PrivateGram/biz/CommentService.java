@@ -39,7 +39,7 @@ public class CommentService {
     try {
       wasCommentPosted = commentDao.postComment(postId, encodedComment, userId);
     } catch(Exception e) {
-      String sanitizedComment = encodedComment.replaceAll("[^A-Za-z0-9(): \\[\\]$&+,:;=?@#|'<>.^*()%!-]", "");
+      String sanitizedComment = encodedComment.replaceAll("[^A-Za-z0-9(): \\[\\]$&+,_:;=?@#|'<>.^*()%!-]", "");
       wasCommentPosted = commentDao.postComment(postId, sanitizedComment, userId);
       executor.execute(() -> {
         bizUtilities.sendServerErrorEmail(e.toString());

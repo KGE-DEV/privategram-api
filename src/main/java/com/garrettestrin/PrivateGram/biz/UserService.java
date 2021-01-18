@@ -3,10 +3,7 @@ package com.garrettestrin.PrivateGram.biz;
 import static org.apache.http.util.TextUtils.isEmpty;
 
 
-import com.garrettestrin.PrivateGram.api.ApiObjects.InvitesResponse;
-import com.garrettestrin.PrivateGram.api.ApiObjects.JWTToken;
-import com.garrettestrin.PrivateGram.api.ApiObjects.UserResponse;
-import com.garrettestrin.PrivateGram.api.ApiObjects.UsersResponse;
+import com.garrettestrin.PrivateGram.api.ApiObjects.*;
 import com.garrettestrin.PrivateGram.app.Auth.Auth;
 import com.garrettestrin.PrivateGram.app.PrivateGramConfiguration;
 import com.garrettestrin.PrivateGram.data.DataObjects.Invite;
@@ -53,8 +50,7 @@ public class UserService {
         this.siteDomain = config.getSiteDomain();
     }
 
-    // TODO: JAVADOC
-    // TODO: Add test
+    @Deprecated
     public UserResponse loginUser(String email, String password, HttpServletResponse response, HttpServletRequest request) throws IOException {
         User user = userDao.getUserByEmail(email);
         if(user == null) {
@@ -79,6 +75,37 @@ public class UserService {
             }
         } else {
             boolean isPasswordVerified = verifyPassword(email, password);
+            if(isPasswordVerified) {
+                setAuthCookie(request, response, user.id);
+            }
+            return UserResponse.builder().success(isPasswordVerified).id(user.id).role(user.role).build();
+        }
+    }
+
+    public UserResponse loginUser(LoginRequest loginRequest, HttpServletResponse response, HttpServletRequest request) throws IOException {
+        User user = userDao.getUserByEmail(loginRequest.email);
+        if(user == null) {
+            return UserResponse.builder().success(false).build();
+        }
+        if(user.wp_pass) {
+            URL url = new URL(wpUrl + "?action=microservice_login&email=" + loginRequest.email + "&password=" + loginRequest.password);
+            InputStream is = url.openStream();
+            try {
+                String resultFromWP = CharStreams.toString(new InputStreamReader(
+                        is, Charsets.UTF_8));
+                JsonParser parser = new JsonParser();
+                JsonElement jsonTree = parser.parse(resultFromWP);
+                JsonObject jsonObject = jsonTree.getAsJsonObject();
+                boolean success = jsonObject.get("success").getAsBoolean();
+                if(success) {
+                    setAuthCookie(request, response, user.id);
+                }
+                return UserResponse.builder().success(success).id(user.id).role(user.role).build();
+            } finally {
+                is.close();
+            }
+        } else {
+            boolean isPasswordVerified = verifyPassword(loginRequest.email, loginRequest.password);
             if(isPasswordVerified) {
                 setAuthCookie(request, response, user.id);
             }

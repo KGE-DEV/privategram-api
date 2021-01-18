@@ -21,8 +21,9 @@ public class CacheResource {
     @Path("/clear")
     @Timed
     public void clearCache(@CookieParam(AUTH_COOKIE) AuthenticatedUser authenticatedUser) {
-
-        cache.clearPostCache();
-        cache.clearCommentCache();
+        if (authenticatedUser.isAdmin) {
+            cache.clearPostCache();
+            cache.clearCommentCache();
+        }
     }
 }

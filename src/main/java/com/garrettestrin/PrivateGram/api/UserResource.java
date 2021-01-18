@@ -48,8 +48,7 @@ public class UserResource {
         return userService.addUser(email, name);
     }
 
-    // TODO: JAVADOC
-    // TODO: add error handling
+    @Deprecated
     @POST
     @Path("/login")
     @Timed
@@ -59,6 +58,15 @@ public class UserResource {
                                  @Context HttpServletRequest request) throws IOException {
 
         return userService.loginUser(email, password, response, request);
+    }
+
+    @POST
+    @Path("/v2/login")
+    @Timed
+    public UserResponse login(LoginRequest loginRequest,
+                            @Context HttpServletResponse response,
+                              @Context HttpServletRequest request) throws IOException {
+        return userService.loginUser(loginRequest, response, request);
     }
 
     // TODO: JAVADOC

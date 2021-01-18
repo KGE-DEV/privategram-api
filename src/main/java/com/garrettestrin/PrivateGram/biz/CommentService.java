@@ -10,28 +10,43 @@ import com.vdurmont.emoji.EmojiParser;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 public class CommentService {
 
   private final CommentDao commentDao;
+  private final BizUtilities bizUtilities;
   private final Cache cache;
+  private final int MAX_THREADS = 50;
+  private final Executor executor = Executors.newFixedThreadPool(MAX_THREADS);
 
   private final String DELETED_MESSAGE_SUCCESS = "comment was deleted";
   private final String DELETED_MESSAGE_FAIL = "comment was not deleted";
   private final String EDITED_MESSAGE_SUCCESS = "comment was edited";
   private final String EDITED_MESSAGE_FAIL = "comment was not edited";
 
-  public CommentService(CommentDao commentDao, Cache cache) {
+  public CommentService(CommentDao commentDao, Cache cache, BizUtilities bizUtilities) {
     this.commentDao = commentDao;
+    this.bizUtilities = bizUtilities;
     this.cache = cache;
   }
 
 
   public CommentResponse postComment(String comment, int postId, int userId) {
+    String encodedComment  = EmojiParser.parseToAliases(comment);
+    boolean wasCommentPosted;
+    try {
+      wasCommentPosted = commentDao.postComment(postId, encodedComment, userId);
+    } catch(Exception e) {
+      String sanitizedComment = encodedComment.replaceAll("[^A-Za-z0-9(): \\[\\]$&+,:;=?@#|'<>.^*()%!-]", "");
+      wasCommentPosted = commentDao.postComment(postId, sanitizedComment, userId);
+      executor.execute(() -> {
+        bizUtilities.sendServerErrorEmail(e.toString());
+      });
+    }
     cache.removeCommentCache(cache.COMMENTS_FOR_ + postId);
     cache.removeCommentCache(cache.PREVIEW_COMMENTS_FOR_ + postId);
-    String encodedComment  = EmojiParser.parseToAliases(comment);
-    boolean wasCommentPosted = commentDao.postComment(postId, encodedComment, userId);
     return new CommentResponse(wasCommentPosted, null, null);
   }
 

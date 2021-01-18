@@ -64,13 +64,15 @@ class DependencyManager {
         // aws
         awsConfig = config.getAwsConfig();
 
+        bizUtilities = new BizUtilities(config);
+
         // UserResource
          final UserDao userDao = db.onDemand(UserDao.class);
          val userService = new UserService(userDao, auth, config);
         userResource = new UserResource(auth, userService);
         // CommentResource
         final CommentDao commentDao = db.onDemand(CommentDao.class);
-        val commentService = new CommentService(commentDao, cache);
+        val commentService = new CommentService(commentDao, cache, bizUtilities);
         commentResource = new CommentResource(commentService);
 
         // PostResource
@@ -86,8 +88,6 @@ class DependencyManager {
         authenticatedUserConverterProvider = new AuthenticatedUserConverterProvider(config, userDao);
         unauthorizedExceptionMapper = new UnauthorizedExceptionMapper();
         serverErrorExceptionMapper = new ServerErrorExceptionMapper(config);
-
-        bizUtilities = new BizUtilities(config);
 
         // HealthChecks
         HealthCheck dbHealthCheck = new DBHealthCheck("users");

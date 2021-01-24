@@ -1,6 +1,7 @@
 package com.garrettestrin.PrivateGram.data;
 
 import com.garrettestrin.PrivateGram.data.DataObjects.Comment;
+import com.garrettestrin.PrivateGram.data.DataObjects.PostComments;
 import org.jdbi.v3.sqlobject.SqlObject;
 import org.jdbi.v3.sqlobject.config.RegisterBeanMapper;
 import org.jdbi.v3.sqlobject.customizer.Bind;
@@ -49,5 +50,11 @@ public interface CommentDao extends SqlObject {
           + "SET active = 0 "
           + "WHERE id = :comment_id")
   boolean deleteComment(@Bind("comment_id") int comment_id);
+
+  @SqlQuery("SELECT c.id, c.post_id, c.comment, c.user_id, u.name FROM comments as c " +
+          "INNER JOIN users as u on c.user_id = u.id " +
+          "WHERE post_id = :post_id and c.active = 1")
+  @RegisterBeanMapper(PostComments.class)
+  List<PostComments> getPostComments(@Bind("post_id") int post_id);
 }
 

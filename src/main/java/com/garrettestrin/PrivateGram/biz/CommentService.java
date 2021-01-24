@@ -5,8 +5,10 @@ import com.garrettestrin.PrivateGram.api.ApiObjects.PostResponse;
 import com.garrettestrin.PrivateGram.data.Cache;
 import com.garrettestrin.PrivateGram.data.CommentDao;
 import com.garrettestrin.PrivateGram.data.DataObjects.Comment;
+import com.garrettestrin.PrivateGram.data.DataObjects.PostComments;
 import com.vdurmont.emoji.EmojiParser;
 
+import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -97,5 +99,17 @@ public class CommentService {
       boolean wasCommentDeleted = commentDao.deleteComment(comment_id);
       String message = wasCommentDeleted ? DELETED_MESSAGE_SUCCESS : DELETED_MESSAGE_FAIL;
       return new CommentResponse(wasCommentDeleted, message, null);
+  }
+
+  public Response getPostComments(int post_id) throws IOException {
+    // check cache for data
+    String cachedComments = cache.getComments(cache.COMMENTS_FOR_ + post_id);
+    // if data is cached
+    if (null != cachedComments) {
+      return Response.ok(cache.decode(cachedComments, List.class)).build();
+    }
+    List<PostComments> comments = commentDao.getPostComments(post_id);
+    cache.setComments(cache.COMMENTS_FOR_ + post_id, cache.encode(comments));
+    return Response.ok(comments).build();
   }
 }

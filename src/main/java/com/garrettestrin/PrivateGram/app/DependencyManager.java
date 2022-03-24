@@ -54,7 +54,6 @@ class DependencyManager {
         log.info("Initializing database pool...");
         // This creates a managed database and creates a JdbiHealthCheck
         final JdbiFactory factory = new JdbiFactory();
-        log.info("DB info: " + config.getDatabase().getUrl() + " " + config.getDatabase().getPassword() + " " + config.getDatabase().getUser());
         Jdbi db = newDatabase(factory, env, config.getDatabase(), "database");
 
         // create in memory cache

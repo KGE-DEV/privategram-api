@@ -129,4 +129,11 @@
     <changeSet author="garrettestrin" id="1597548061351-8">
         <modifyDataType columnName="post_image_url" tableName="posts" newDataType="varchar(2000)"/>
     </changeSet>
+    <changeSet author="garrettestrin" id="1597548061351-9">
+        <addColumn tableName="posts" >
+            <column defaultValue="eg" name="site_key" type="varchar(2)">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>

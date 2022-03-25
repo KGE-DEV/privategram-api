@@ -75,76 +75,27 @@ public class PostService {
     this.bizUtilities = new BizUtilities(config);
     this.cache = cache;
   }
-  @Deprecated
-  public PostResponse addPost(String caption, InputStream inputStream, String name, String type) throws IOException {
-    writeStreamToFile(inputStream, name);
-    executor.execute(() -> {
-      String urlString;
-      try {
-        urlString = uploadToS3(resizeAndCompressImage(name, 0, 0), type, name);
-      } catch (IOException | ImageProcessingException e) {
-        e.printStackTrace();
-        // if post failed
-        // send an email to admins
-       bizUtilities.sendPostErrorEmail(userDao.getAdminUsers(), caption);
-       return;
-      }
-      postDao.addPost(EmojiParser.parseToAliases(caption), awsConfig.getBucketUrl() + "/" + urlString);
-      log.info("Post was successfully processed");
-    });
-    return PostResponse.builder().success(true).message("Your post is being processed").build();
+
+  public PostResponse getAllPosts(String siteKey) {
+    if (null == siteKey) return PostResponse.builder().success(false).message("No siteKey set").build();
+    return new PostResponse(true, null, postDao.getAllPosts(siteKey));
   }
 
-  /**
-   * Processes image upload, uploads to AWS and inserts into DB
-   * Response is returned after image is uploaded to server, but before it is fully processed
-   * @param caption
-   * @param inputStream
-   * @param name
-   * @param type
-   * @param isPrivate
-   * @return
-   * @throws IOException
-   */
-  public PostResponse addPost(String caption, InputStream inputStream, String name, String type, boolean isPrivate, int height, int width) throws IOException {
-    writeStreamToFile(inputStream, name);
-    executor.execute(() -> {
-      String urlString;
-      try {
-        urlString = uploadToS3(resizeAndCompressImage(name, height, width), type, name);
-      } catch (IOException | ImageProcessingException e) {
-        e.printStackTrace();
-        // if post failed
-        // send an email to admins
-        bizUtilities.sendPostErrorEmail(userDao.getAdminUsers(), caption);
-        return;
-      }
-      postDao.addPost(EmojiParser.parseToAliases(caption), awsConfig.getBucketUrl() + "/" + urlString, isPrivate);
-      cache.clearPostCache();
-      log.info("Post was successfully processed");
-    });
-    return PostResponse.builder().success(true).message("Your post is being processed").build();
-  }
-
-  public PostResponse getAllPosts() {
-    return new PostResponse(true, null, postDao.getAllPosts());
-  }
-
-  public PostResponse getPaginatedPosts(Integer lower_limit, boolean isAdmin) throws IOException {
+  public PostResponse getPaginatedPosts(Integer lower_limit, boolean isAdmin, String siteKey) throws IOException {
     String page = lower_limit.toString();
     if(lower_limit > 0) {
       lower_limit = (lower_limit - 1) * 10;
     }
     // check cache for data
-    String cachedPosts = cache.getPost(cache.POST_PAGE + page, isAdmin);
+    String cachedPosts = cache.getPost(cache.POST_PAGE + page + siteKey, isAdmin);
     // if data is cached
     if (null != cachedPosts) {
       return cache.decode(cachedPosts, PostResponse.class);
     }
     // if no data in cache, get from db and then cache
     // then return data
-    PostResponse postResponse = new PostResponse(true, null, parsePostsForEmojis(postDao.getPaginatedPosts(lower_limit, isAdmin)));
-    cache.setPost(cache.POST_PAGE + page, cache.encode(postResponse), isAdmin);
+    PostResponse postResponse = new PostResponse(true, null, parsePostsForEmojis(postDao.getPaginatedPosts(lower_limit, isAdmin, siteKey)));
+    cache.setPost(cache.POST_PAGE + page + siteKey, cache.encode(postResponse), isAdmin);
     return postResponse;
   }
 
@@ -163,13 +114,13 @@ public class PostService {
     return new PostResponse(wasPostDeleted, postDeletedMessage, null);
   }
 
-  public PostCountResponse postCount(boolean isAdmin) {
-    String postCountCached = cache.getPost(cache.POST_COUNT, isAdmin);
+  public PostCountResponse postCount(boolean isAdmin, String siteKey) {
+    String postCountCached = cache.getPost(cache.POST_COUNT + siteKey, isAdmin);
     if (null != postCountCached) {
       return new PostCountResponse(Integer.parseInt(postCountCached));
     }
-    int postCount = postDao.postCount(isAdmin);
-    cache.setPost(cache.POST_COUNT, String.valueOf(postCount), isAdmin);
+    int postCount = postDao.postCount(isAdmin, siteKey);
+    cache.setPost(cache.POST_COUNT + siteKey, String.valueOf(postCount), isAdmin);
     return new PostCountResponse(postCount);
   }
 
@@ -282,10 +233,10 @@ public class PostService {
     return PostResponse.builder().posts(postDao.getIndividualPost(pageId, admin)).build();
   }
 
-  public PostResponse handleMultiPost(String caption, boolean isPrivate, JSONArray filesData, FormDataMultiPart multiPart) throws IOException {
+  public PostResponse handleMultiPost(String caption, boolean isPrivate, JSONArray filesData, FormDataMultiPart multiPart, String siteKey) throws IOException {
+    if (null == siteKey) return PostResponse.builder().success(false).message("Missing siteKey").build();
     List<FormDataBodyPart> bodyParts =
             multiPart.getFields("file");
-//    List imageUrls = new ArrayList(Arrays.asList(bodyParts.size()));
     List imageUrls = new ArrayList();
     int iterator = 0;
     for (FormDataBodyPart part : bodyParts) {
@@ -306,7 +257,7 @@ public class PostService {
     // new thread to handle saving to db
     executor.execute(() -> {
       while (doesArrayContainNull(imageUrls)) { }
-      postDao.addPost(EmojiParser.parseToAliases(caption), String.join(",", imageUrls), isPrivate);
+      postDao.addPost(EmojiParser.parseToAliases(caption), String.join(",", imageUrls), isPrivate, siteKey);
       cache.clearPostCache();
       log.info("Post was successfully processed");
     });

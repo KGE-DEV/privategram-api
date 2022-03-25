@@ -10,11 +10,6 @@ import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 import java.util.List;
 
 public interface PostDao extends SqlObject {
-  @Deprecated
-  @SqlUpdate("INSERT INTO "
-          + "`posts` (`post_content`, `post_image_url`) "
-          +   "VALUES (:post_content, :post_image_url);")
-  boolean addPost(@Bind("post_content") String post_content, @Bind("post_image_url") String post_image_url);
 
   /**
    * Insert new post in database
@@ -24,9 +19,13 @@ public interface PostDao extends SqlObject {
    * @return boolean representing successful insertion
    */
   @SqlUpdate("INSERT INTO "
-          + "`posts` (`post_content`, `post_image_url`, `private`) "
-          + "VALUES (:post_content, :post_image_url, :is_private);")
-  boolean addPost(@Bind("post_content") String post_content, @Bind("post_image_url") String post_image_url, @Bind("is_private") boolean is_private);
+          + "`posts` (`post_content`, `post_image_url`, `private`, `site_key`) "
+          + "VALUES (:post_content, :post_image_url, :is_private, :site_key);")
+  boolean addPost(
+          @Bind("post_content") String post_content,
+          @Bind("post_image_url") String post_image_url,
+          @Bind("is_private") boolean is_private,
+          @Bind("site_key") String site_key);
 
   @SqlQuery("SELECT * "
           + "FROM `posts` "
@@ -36,10 +35,10 @@ public interface PostDao extends SqlObject {
 
   @SqlQuery("SELECT * "
           + "FROM `posts` "
-          + "WHERE active = 1 "
+          + "WHERE active = 1 and site_key = :site_key "
           + "Order by id DESC ")
   @RegisterBeanMapper(Post.class)
-  List<Post> getAllPosts();
+  List<Post> getAllPosts(@Bind("site_key") String site_key);
 
   /**
    * Returns paginated list of posts
@@ -50,11 +49,13 @@ public interface PostDao extends SqlObject {
    */
   @SqlQuery("SELECT * "
           + "FROM `posts` "
-          + "WHERE active = 1 and private <= :is_admin "
+          + "WHERE active = 1 and private <= :is_admin and site_key = :site_key "
           + "Order by id DESC "
           + "LIMIT :lower_limit, 10")
   @RegisterBeanMapper(Post.class)
-  List<Post> getPaginatedPosts(@Bind("lower_limit") int lower_limit, @Bind("is_admin") boolean isAdmin);
+  List<Post> getPaginatedPosts(@Bind("lower_limit") int lower_limit,
+                               @Bind("is_admin") boolean isAdmin,
+                               @Bind("site_key") String site_key);
 
   @SqlUpdate("UPDATE `posts` "
           + "SET post_content = :post_content "
@@ -67,8 +68,8 @@ public interface PostDao extends SqlObject {
   boolean deletePost(@Bind("post_id") int postId);
 
   @SqlQuery("SELECT COUNT(*) FROM posts "
-          + "WHERE active = 1 and private <= :isAdmin")
-  int postCount(@Bind("isAdmin") boolean isAdmin);
+          + "WHERE active = 1 and private <= :isAdmin and site_key = :site_key")
+  int postCount(@Bind("isAdmin") boolean isAdmin, @Bind("site_key") String site_key);
 
   /**
    * Returns an individual post

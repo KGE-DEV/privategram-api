@@ -250,7 +250,7 @@ public class PostService {
     }
     ImageIO.write(rotatedImage, type, new File("tmp/" + fileName));
     overWriteToS3("tmp/" + fileName, type, fileName);
-    return PostResponse.builder().message("cool").build();
+    return PostResponse.builder().success(true).message(image.getImgUrl()).build();
   }
 
   private List<Post> parsePostsForEmojis(List<Post> posts) {

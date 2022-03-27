@@ -172,24 +172,24 @@ public class PostService {
     String pathToFile = "tmp/" + name;
 //    compare uploaded height and width to saved file
 //    if different, the image needs to be rotated
-    if (postedHeight > 0 && postedWidth > 0) {
-      int actualHeight = 0;
-      int actualWidth = 0;
-      Metadata metadata = ImageMetadataReader.readMetadata(new File(pathToFile));
-      for (Directory directory : metadata.getDirectories()) {
-        for (Tag tag : directory.getTags()) {
-          if (tag.getTagName().equals("Image Height")) {
-            actualHeight = Integer.parseInt(tag.getDescription().split(" ")[0]);
-          }
-          if (tag.getTagName().equals("Image Width")) {
-            actualWidth = Integer.parseInt(tag.getDescription().split(" ")[0]);
-          }
-        }
-      }
-      if (actualHeight != postedHeight && actualWidth != postedWidth && actualHeight != 0 && actualWidth != 0) {
-        rotateImage(pathToFile);
-      }
-    }
+//    if (postedHeight > 0 && postedWidth > 0) {
+//      int actualHeight = 0;
+//      int actualWidth = 0;
+//      Metadata metadata = ImageMetadataReader.readMetadata(new File(pathToFile));
+//      for (Directory directory : metadata.getDirectories()) {
+//        for (Tag tag : directory.getTags()) {
+//          if (tag.getTagName().equals("Image Height")) {
+//            actualHeight = Integer.parseInt(tag.getDescription().split(" ")[0]);
+//          }
+//          if (tag.getTagName().equals("Image Width")) {
+//            actualWidth = Integer.parseInt(tag.getDescription().split(" ")[0]);
+//          }
+//        }
+//      }
+//      if (actualHeight != postedHeight && actualWidth != postedWidth && actualHeight != 0 && actualWidth != 0) {
+//        rotateImage(pathToFile);
+//      }
+//    }
 
     Source source = Tinify.fromFile(pathToFile);
     Options options = new Options()
@@ -247,7 +247,9 @@ public class PostService {
       writeStreamToFile(part.getValueAs(InputStream.class), fileData.getString("name"));
       executor.execute(() -> {
         try {
-          imageUrls.set(fileData.getInt("order"), addMultiPost(caption, fileData.getString("name"), fileData.getString("type"), fileData.getInt("height"), fileData.getInt("width")));
+          imageUrls.set(
+                  fileData.getInt("order"),
+                  addMultiPost(caption, fileData.getString("name"), fileData.getString("type"), fileData.getInt("height"), fileData.getInt("width")));
         } catch (IOException e) {
           e.printStackTrace();
         }

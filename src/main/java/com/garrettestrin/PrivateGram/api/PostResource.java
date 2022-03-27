@@ -7,9 +7,11 @@ import com.codahale.metrics.annotation.Timed;
 import com.garrettestrin.PrivateGram.api.ApiObjects.Post;
 import com.garrettestrin.PrivateGram.api.ApiObjects.PostCountResponse;
 import com.garrettestrin.PrivateGram.api.ApiObjects.PostResponse;
+import com.garrettestrin.PrivateGram.api.ApiObjects.RotateImage;
 import com.garrettestrin.PrivateGram.app.Auth.AuthenticatedUser;
 import com.garrettestrin.PrivateGram.biz.PostService;
 import java.io.IOException;
+import java.util.List;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.CookieParam;
 import javax.ws.rs.DELETE;
@@ -22,6 +24,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
+import io.dropwizard.jersey.PATCH;
 import org.glassfish.jersey.media.multipart.FormDataMultiPart;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.json.JSONArray;
@@ -116,5 +119,16 @@ public class PostResource {
   public PostCountResponse postCount(@QueryParam("siteKey") String siteKey,
           @CookieParam(AUTH_COOKIE) AuthenticatedUser authenticatedUser) {
     return postService.postCount(authenticatedUser.isAdmin(), siteKey);
+  }
+
+  @PATCH
+  @Path("/rotate-image")
+  @Timed
+  public PostResponse rotateImage(RotateImage image,
+                                  @CookieParam(AUTH_COOKIE) AuthenticatedUser authenticatedUser) throws IOException {
+    if (!authenticatedUser.isAdmin) {
+      return PostResponse.builder().message("Access Denied").build();
+    }
+    return postService.rotateImage(image);
   }
 }

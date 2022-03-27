@@ -121,7 +121,7 @@ public class PostResource {
     return postService.postCount(authenticatedUser.isAdmin(), siteKey);
   }
 
-  @PATCH
+  @POST
   @Path("/rotate-image")
   @Timed
   public PostResponse rotateImage(RotateImage image,

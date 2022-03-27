@@ -10,13 +10,10 @@ import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.amazonaws.util.IOUtils;
-import com.drew.imaging.ImageMetadataReader;
 import com.drew.imaging.ImageProcessingException;
-import com.drew.metadata.Directory;
-import com.drew.metadata.Metadata;
-import com.drew.metadata.Tag;
 import com.garrettestrin.PrivateGram.api.ApiObjects.PostCountResponse;
 import com.garrettestrin.PrivateGram.api.ApiObjects.PostResponse;
+import com.garrettestrin.PrivateGram.api.ApiObjects.RotateImage;
 import com.garrettestrin.PrivateGram.app.Config.AWSConfig;
 import com.garrettestrin.PrivateGram.app.PrivateGramConfiguration;
 import com.garrettestrin.PrivateGram.data.Cache;
@@ -41,6 +38,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executor;
@@ -152,6 +150,34 @@ public class PostService {
     return fileName;
   }
 
+  private String overWriteToS3(String fileName, String type, String name) {
+
+    try {
+      BasicAWSCredentials awsCreds = new BasicAWSCredentials(awsConfig.getS3AccessKey(), awsConfig.getS3SecretKey());
+      AmazonS3 s3Client = AmazonS3ClientBuilder.standard()
+              .withRegion(regions)
+              .withCredentials(new AWSStaticCredentialsProvider(awsCreds))
+              .build();
+      // Upload a file as a new object with ContentType and title specified.
+      String urlName = name;
+      PutObjectRequest request = new PutObjectRequest(awsConfig.getBucket(), urlName, new File(fileName));
+      ObjectMetadata metadata = new ObjectMetadata();
+      metadata.setContentType(type);
+      request.setMetadata(metadata);
+      s3Client.putObject(request);
+      return urlName;
+    } catch (AmazonServiceException e) {
+      // The call was transmitted successfully, but Amazon S3 couldn't process
+      // it, so it returned an error response.
+      e.printStackTrace();
+    } catch (SdkClientException e) {
+      // Amazon S3 couldn't be contacted for a response, or the client
+      // couldn't parse the response from Amazon S3.
+      e.printStackTrace();
+    }
+    return fileName;
+  }
+
   private String writeStreamToFile(InputStream inputStream, String name) throws IOException {
     File directory = new File("tmp");
     if (! directory.exists()) {
@@ -200,23 +226,31 @@ public class PostService {
     return pathToFile;
   }
 
-  private void rotateImage(String pathToFile) throws IOException {
-    BufferedImage image = ImageIO.read(new File(pathToFile));
-    final double rads = Math.toRadians(90);
+  public PostResponse rotateImage(RotateImage image) throws IOException {
+    URL url = new URL(image.getImgUrl());
+    BufferedImage bufferedImage = ImageIO.read(url.openStream());
+    String fileName = url.getFile().replaceAll("/", "");
+    final double rads = Math.toRadians(image.getRotation());
     final double sin = Math.abs(Math.sin(rads));
     final double cos = Math.abs(Math.cos(rads));
-    final int w = (int) Math.floor(image.getWidth() * cos + image.getHeight() * sin);
-    final int h = (int) Math.floor(image.getHeight() * cos + image.getWidth() * sin);
-    final BufferedImage rotatedImage = new BufferedImage(w, h, image.getType());
+    final int w = (int) Math.floor(bufferedImage.getWidth() * cos + bufferedImage.getHeight() * sin);
+    final int h = (int) Math.floor(bufferedImage.getHeight() * cos + bufferedImage.getWidth() * sin);
+    final BufferedImage rotatedImage = new BufferedImage(w, h, bufferedImage.getType());
     final AffineTransform at = new AffineTransform();
     at.translate(w / 2, h / 2);
     at.rotate(rads,0, 0);
-    at.translate(-image.getWidth() / 2, -image.getHeight() / 2);
+    at.translate(-bufferedImage.getWidth() / 2, -bufferedImage.getHeight() / 2);
     final AffineTransformOp rotateOp = new AffineTransformOp(at, AffineTransformOp.TYPE_BILINEAR);
-    rotateOp.filter(image,rotatedImage);
-    String[] typeArray = pathToFile.split("\\.");
+    rotateOp.filter(bufferedImage,rotatedImage);
+    String[] typeArray = fileName.split("\\.");
     String type = typeArray[1].toUpperCase();
-    ImageIO.write(rotatedImage, type, new File(pathToFile));
+    File directory = new File("tmp");
+    if (! directory.exists()) {
+      directory.mkdir();
+    }
+    ImageIO.write(rotatedImage, type, new File("tmp/" + fileName));
+    overWriteToS3("tmp/" + fileName, type, fileName);
+    return PostResponse.builder().message("cool").build();
   }
 
   private List<Post> parsePostsForEmojis(List<Post> posts) {
@@ -297,5 +331,4 @@ public class PostService {
       }
       return awsConfig.getBucketUrl() + "/" + urlString;
     }
-
 }

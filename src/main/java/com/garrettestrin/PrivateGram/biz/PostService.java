@@ -220,7 +220,7 @@ public class PostService {
     Source source = Tinify.fromFile(pathToFile);
     Options options = new Options()
             .with("method", "scale")
-            .with("width", 500);
+            .with("width", 1000);
     Source resized = source.resize(options);
     resized.toFile(pathToFile);
     return pathToFile;

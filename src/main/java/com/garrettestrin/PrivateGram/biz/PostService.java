@@ -9,6 +9,8 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.amazonaws.services.s3.model.GetObjectRequest;
+import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.util.IOUtils;
 import com.drew.imaging.ImageProcessingException;
 import com.garrettestrin.PrivateGram.api.ApiObjects.PostCountResponse;
@@ -228,9 +230,15 @@ public class PostService {
 
   public PostResponse rotateImage(RotateImage image) throws IOException {
     URL url = new URL(image.getImgUrl());
-    BufferedImage bufferedImage = ImageIO.read(url.openStream());
     String fileName = url.getFile().replaceAll("/", "");
+    BasicAWSCredentials awsCreds = new BasicAWSCredentials(awsConfig.getS3AccessKey(), awsConfig.getS3SecretKey());
+    AmazonS3 s3Client = AmazonS3ClientBuilder.standard()
+            .withRegion(regions)
+            .withCredentials(new AWSStaticCredentialsProvider(awsCreds))
+            .build();
 
+    S3Object originalImage = s3Client.getObject(new GetObjectRequest(awsConfig.getBucket(), fileName));
+    BufferedImage bufferedImage = ImageIO.read(originalImage.getObjectContent());
     final double rads = Math.toRadians(image.getRotation());
     final double sin = Math.abs(Math.sin(rads));
     final double cos = Math.abs(Math.cos(rads));

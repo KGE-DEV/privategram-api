@@ -188,7 +188,7 @@ public class PostService {
     File file = new File(pathName);
     BufferedImage img = ImageIO.read(new ByteArrayInputStream(bytes));
     String[] typeArray = name.split("\\.");
-    String type = typeArray[1].toUpperCase();
+    String type = typeArray[typeArray.length - 1].toUpperCase();
     ImageIO.write(img, type, file);
     return pathName;
   }
@@ -230,6 +230,7 @@ public class PostService {
     URL url = new URL(image.getImgUrl());
     BufferedImage bufferedImage = ImageIO.read(url.openStream());
     String fileName = url.getFile().replaceAll("/", "");
+
     final double rads = Math.toRadians(image.getRotation());
     final double sin = Math.abs(Math.sin(rads));
     final double cos = Math.abs(Math.cos(rads));
@@ -243,7 +244,7 @@ public class PostService {
     final AffineTransformOp rotateOp = new AffineTransformOp(at, AffineTransformOp.TYPE_BILINEAR);
     rotateOp.filter(bufferedImage,rotatedImage);
     String[] typeArray = fileName.split("\\.");
-    String type = typeArray[1].toUpperCase();
+    String type = typeArray[typeArray.length - 1].toUpperCase();
     File directory = new File("tmp");
     if (! directory.exists()) {
       directory.mkdir();

@@ -35,7 +35,7 @@ public interface PostDao extends SqlObject {
 
   @SqlQuery("SELECT * "
           + "FROM `posts` "
-          + "WHERE active = 1 and site_key = :site_key "
+          + "WHERE active = 1 and (site_key = :site_key or site_key = 'cp') "
           + "Order by id DESC ")
   @RegisterBeanMapper(Post.class)
   List<Post> getAllPosts(@Bind("site_key") String site_key);
@@ -49,7 +49,7 @@ public interface PostDao extends SqlObject {
    */
   @SqlQuery("SELECT * "
           + "FROM `posts` "
-          + "WHERE active = 1 and private <= :is_admin and site_key = :site_key "
+          + "WHERE active = 1 and private <= :is_admin and (site_key = :site_key or site_key = 'cp') "
           + "Order by id DESC "
           + "LIMIT :lower_limit, 10")
   @RegisterBeanMapper(Post.class)
@@ -68,7 +68,7 @@ public interface PostDao extends SqlObject {
   boolean deletePost(@Bind("post_id") int postId);
 
   @SqlQuery("SELECT COUNT(*) FROM posts "
-          + "WHERE active = 1 and private <= :isAdmin and site_key = :site_key")
+          + "WHERE active = 1 and private <= :isAdmin and (site_key = :site_key or site_key = 'cp')")
   int postCount(@Bind("isAdmin") boolean isAdmin, @Bind("site_key") String site_key);
 
   /**

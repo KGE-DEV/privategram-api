@@ -16,11 +16,11 @@ jobs:
       env: 
         HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY_ELSIEGRAM_API }}
       run: heroku container:login 
-    - name: Build and push
+    - name: Add Heroku Remote
       env:
         HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY_ELSIEGRAM_API }}
-      run: heroku container:push -a elsiegram-api web 
+      run: heroku git:remote -a elsiegram-api
     - name: Release
       env:
         HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY_ELSIEGRAM_API }}
-      run: heroku container:release -a elsiegram-api web 
+      run: git push heroku master

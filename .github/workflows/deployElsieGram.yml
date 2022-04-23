@@ -4,15 +4,13 @@ on:
   push:
     branches:
       - master
-
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v1
-    - name: Install Heroku CLI
-      run: brew tap heroku/brew && brew install heroku
-    - name: Login to Heroku, Set remote branch, push master branch
-      env: 
-        HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY_ELSIEGRAM_API }}
-      run: heroku login && heroku git:remote -a elsiegram-api && git push heroku HEAD:master
+      - uses: actions/checkout@v2
+      - uses: akhileshns/heroku-deploy@v3.12.12 # This is the action
+        with:
+          heroku_api_key: ${{secrets.HEROKU_API_KEY_ELSIEGRAM_API}}
+          heroku_app_name: "elsiegram-api" #Must be unique in Heroku
+          heroku_email: "garrett.estrin@gmail.com"

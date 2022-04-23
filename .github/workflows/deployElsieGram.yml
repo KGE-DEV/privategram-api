@@ -1,0 +1,18 @@
+name: Deploy ElsieGram-API
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: akhileshns/heroku-deploy@v3.0.4
+        with:
+          heroku_api_key: ${{secrets.HEROKU_API_KEY-ELSIEGRAM_API}}
+          heroku_app_name: "elsiegram-api"
+          heroku_email: "garrett.estrin@gmail.com"
+          buildpack: "heroku/java"

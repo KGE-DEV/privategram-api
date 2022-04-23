@@ -15,4 +15,4 @@ jobs:
     - name: Login to Heroku, Set remote branch, push master branch
       env: 
         HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY_ELSIEGRAM_API }}
-      run: heroku container:login && heroku git:remote -a elsiegram-api && git push heroku HEAD:master
+      run: heroku login && heroku git:remote -a elsiegram-api && git push heroku HEAD:master
